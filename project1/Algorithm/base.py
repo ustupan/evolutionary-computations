@@ -1,11 +1,9 @@
 import numpy as np
 
-from Algorithm.beale_function import Function
-
 
 class Base:
-    def __init__(self, population_size, num_of_variables, range_min, range_max, precision):
-        self.function = Function.bale_function()
+    def __init__(self, function, population_size, num_of_variables, range_min, range_max, precision):
+        self.function = function
         self.population_size = population_size
         self.num_of_variables = num_of_variables
         self.range_min = range_min
