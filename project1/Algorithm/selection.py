@@ -3,7 +3,7 @@ import numpy as np
 
 class Selection:
     @staticmethod
-    def best(pop, evaluated_pop, percent, is_max):
+    def best(pop, evaluated_pop, percent, is_max = True):
         num_of_selected = int(evaluated_pop.size * percent * 0.01)
         if is_max:
             indexes = evaluated_pop.argsort()[:num_of_selected]
@@ -14,7 +14,7 @@ class Selection:
         return best, best_val
 
     @staticmethod
-    def tournament(pop, evaluated_pop, k, is_max):
+    def tournament(pop, evaluated_pop, k, is_max = True):
         indexes = np.array([i for i in range(len(evaluated_pop))])
         np.random.shuffle(indexes)
         indexes = np.array_split(indexes, int(len(evaluated_pop) / k))
@@ -27,7 +27,7 @@ class Selection:
         return best, best_val
 
     @staticmethod
-    def roulette(pop, evaluated_pop, percent, is_max):
+    def roulette(pop, evaluated_pop, percent, is_max = True):
         if np.ndarray.min(evaluated_pop) <= 0:
             evaluated_pop = evaluated_pop + abs(np.ndarray.min(evaluated_pop)) + 1
         if is_max:
