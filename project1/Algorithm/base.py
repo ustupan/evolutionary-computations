@@ -11,7 +11,6 @@ class Base:
         self.precision = precision
         self.num_of_bits = self.get_num_of_bits()
         self.new_step = self.new_step()
-        self.population = self.generate_population()
 
     def get_num_of_bits(self):
         return int((self.range_max - self.range_min) / self.precision).bit_length()
@@ -33,14 +32,14 @@ class Base:
             decode_individual[j] = sum(np.multiply(vector, temp[j])) * self.new_step + self.range_min
         return decode_individual
 
-    def evaluate_population(self, population, amount_variables, amount_of_bits, a, step):
-        evaluated_pop = np.ndarray(int(population.size / (amount_of_bits * amount_variables)))
-        for i in range(int(population.size / (amount_of_bits * amount_variables))):
+    def evaluate_population(self, population):
+        evaluated_pop = np.ndarray(int(population.size / (self.num_of_bits * self.num_of_variables)))
+        for i in range(int(population.size / (self.num_of_bits * self.num_of_variables))):
             evaluated_pop[i] = self.function(self.decode_individual(population[i]))
         return evaluated_pop
 
-    def best_individual(self, evaluated_population):
-        return self.population[np.argmax(evaluated_population)]
+    def best_individual(self, population, evaluated_population):
+        return population[np.argmax(evaluated_population)]
 
     def best_value(self, evaluated_population):
         return max(evaluated_population)
