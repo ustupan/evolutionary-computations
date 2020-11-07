@@ -4,6 +4,7 @@ import numpy as np
 class Mutation:
     @staticmethod
     def point_mutation(pop, probability):
+        #print(pop)
         new_pop = []
         for i in range(pop.shape[0]):
             new_pop.append(pop[i])
