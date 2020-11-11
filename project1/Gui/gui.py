@@ -18,6 +18,8 @@ class MainApplication(tk.Frame):
         self.box = tk.Entry(master)
         self.width = self.master.winfo_screenwidth() / 1.25
         self.height = self.master.winfo_screenheight() / 1.25
+        self.configure_gui()
+        self.create_widgets()
 
     def configure_gui(self):
         self.master.title("OE - Projekt nr 1")
