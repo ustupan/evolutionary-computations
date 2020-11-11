@@ -19,7 +19,7 @@ class Base:
         return (self.range_max - self.range_min) / (2 ** self.num_of_bits - 1)
 
     def generate_population(self):
-        return np.randint(2, size=(self.population_size, self.num_of_variables * self.num_of_bits))
+        return np.random.randint(2, size=(self.population_size, self.num_of_variables * self.num_of_bits))
 
     def decode_individual(self, individual):
         temp = individual.reshape((self.num_of_variables, self.num_of_bits))
