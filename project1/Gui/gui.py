@@ -40,12 +40,12 @@ class MainApplication(tk.Frame):
         self.set_canvas_to_right_frame()
 
     def set_canvas_to_left_frame(self):
-        left_canvas = tk.Canvas(self.left_frame, width=self.width * 0.55 - 15, height=self.height - 20,
+        left_canvas = tk.Canvas(self.left_frame, width=self.width * 0.45 - 15, height=self.height - 20,
                                 highlightthickness=0,
                                 background="white")
 
-        left_scrollbar = ttk.Scrollbar(self.left_frame, orient="vertical", command=left_canvas.yview)
-        self.left_scrollable_frame = ttk.Frame(left_canvas)
+        left_scrollbar = tk.Scrollbar(self.left_frame, orient="vertical", command=left_canvas.yview)
+        self.left_scrollable_frame = tk.Frame(left_canvas)
 
         self.left_scrollable_frame.bind(
             "<Configure>",
@@ -60,12 +60,12 @@ class MainApplication(tk.Frame):
         left_scrollbar.pack(side="right", fill="y", pady=10)
 
     def set_canvas_to_right_frame(self):
-        right_canvas = tk.Canvas(self.right_frame, width=self.width * 0.45 - 15, height=self.height - 20,
+        right_canvas = tk.Canvas(self.right_frame, width=self.width * 0.55 - 15, height=self.height - 20,
                                  highlightthickness=0,
-                                 background="#ECECEC")
+                                 background="blue")
 
-        right_scrollbar = ttk.Scrollbar(self.right_frame, orient="vertical", command=right_canvas.yview)
-        self.right_scrollable_frame = ttk.Frame(right_canvas)
+        right_scrollbar = tk.Scrollbar(self.right_frame, orient="vertical", command=right_canvas.yview)
+        self.right_scrollable_frame = tk.Frame(right_canvas, background="#b3d9ff")
 
         self.right_scrollable_frame.bind(
             "<Configure>",
@@ -73,6 +73,7 @@ class MainApplication(tk.Frame):
                 scrollregion=right_canvas.bbox("all")
             )
         )
+
         self.create_right_frame_widgets()
 
         right_canvas.create_window((0, 0), window=self.right_scrollable_frame, anchor=tk.N + tk.W)
@@ -81,23 +82,53 @@ class MainApplication(tk.Frame):
         right_canvas.pack(side="left", fill="y", expand=False, pady=10)
         right_scrollbar.pack(side="right", fill="y", pady=10)
 
-
-
     def create_right_frame_widgets(self):
-        # v = ["one", "two", "three", "four"]
-        # self.combo = ttk.Combobox(self.right_frame, values=v)
-        # self.combo.grid(row=0, column=0, padx=10, pady=10)
-        # self.combo.bind("<<ComboboxSelected>>", self.justamethod)
+        self.combo = ttk.Combobox(self.right_scrollable_frame, values=("Maksymalizacja", "Minimalizacja"))
+        self.combo.set("Maksymalizacja")
+        self.combo.grid(row=1, column=1)
+
+        self.combo.bind("<<ComboboxSelected>>", self.justamethod)
+
+        self.set_lables_right_frame()
+
+        self.button2 = tk.Button(self.right_scrollable_frame, text='Button4', highlightbackground='#3E4149',
+                                 command=self.plot, width=round(self.width * 0.55 - 500))
+        self.button2.grid(row=13, columnspan=2, sticky="S")
         #
         # self.button1 = Button(self.right_frame, text='Button3', borderless=1)
         # self.button1.grid(row=1, column=0)
 
-        for i in range (40):
-            self.button2 = ttk.Button(self.right_scrollable_frame, text='Button4', command=self.plot)
-            self.button2.grid(row=i, column=1)
+        # for i in range(40):
+        #     self.button2 = tk.Button(self.right_scrollable_frame, text='Button4', highlightbackground='#3E4149',
+        #                              command=self.plot)
+        #     self.button2.grid(row=i, column=1)
+        #
+        #     self.button3 = tk.Button(self.right_scrollable_frame, text='Button5', command=self.plot)
+        #     self.button3.grid(row=i, column=2)
 
-            self.button3 = ttk.Button(self.right_scrollable_frame, text='Button5', command=self.plot)
-            self.button3.grid(row=i, column=2)
+    def set_lables_right_frame(self):
+        title = self.create_label("Algorytm genetyczny znajdujący maks/min w Funkcji Beale", 0)
+        optimization_label = self.create_label("Maksymalizajca/Minimalizacja funkcji", 1)
+        range_of_X1 = self.create_label("Przedział X1 funkcji", 2)
+        range_of_X2 = self.create_label("Przedział X2 funkcji", 3)
+        chromosome_accuracy = self.create_label("Dokładności chromosomu", 4)
+        population_size = self.create_label("Wielkości populacji", 5)
+        age_value = self.create_label("Liczba epok", 6)
+        selection_method = self.create_label("Metoda selekcji", 7)
+        crossing_method = self.create_label("Krzyżowanie", 8)
+        crossing_method_probability = self.create_label("Prawdopodobieństwo krzyżowania", 9)
+        mutation_method = self.create_label("Mutacja", 10)
+        mutation_method_probability = self.create_label("Prawdopodobieństwo mutacji", 11)
+        inversion_method_probability = self.create_label("Prawdopodobieństwo inwersji", 12)
+
+    def create_label(self, title, row):
+        return tk.Label(self.right_scrollable_frame,
+                        text=title,
+                        font="system-ui 13 bold",
+                        bg="#b3d9ff", fg="#0066cc").grid(row=row, column=0, padx=0, pady=10, sticky="W")
+
+        # self.button3 = tk.Button(self.right_scrollable_frame, text='Button5', command=self.plot)
+        # self.button3.grid(row=1, column=2, padx=(150, 0))
 
     def justamethod(self, event):
         print("method is called: choosen -> ", self.combo.get())
@@ -107,7 +138,7 @@ class MainApplication(tk.Frame):
         p = np.array([16.23697, 17.31653, 17.22094, 17.68631, 17.73641, 18.6368, 19.32125, 19.31756, 21.20247, 22.41444,
                       22.11718, 22.12453])
 
-        fig = Figure(figsize=(6, 6))
+        fig = Figure(figsize=(5, 5))
         a = fig.add_subplot(111)
         a.plot(p, range(2 + max(x)), color='blue')
 
