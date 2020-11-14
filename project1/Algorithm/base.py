@@ -38,8 +38,14 @@ class Base:
             evaluated_pop[i] = self.function(self.decode_individual(population[i]))
         return evaluated_pop
 
-    def best_individual(self, population, evaluated_population):
-        return population[np.argmax(evaluated_population)]
+    def best_individual(self, population, evaluated_population, is_max=True):
+        if is_max:
+            return population[np.argmax(evaluated_population)]
+        else:
+            return population[np.argmin(evaluated_population)]
 
-    def best_value(self, evaluated_population):
-        return max(evaluated_population)
+    def best_value(self, evaluated_population, is_max=True):
+        if is_max:
+            return max(evaluated_population)
+        else:
+            return min(evaluated_population)

@@ -44,21 +44,23 @@ class GeneticAlgorithm:
         solution_mean = [(sum(evaluated_pop) / self.population_size)]
         solution_std = [(sum(evaluated_pop) / self.population_size)]
         for epoch in range(self.num_of_epochs):
+            evaluated_pop = base.evaluate_population(pop)
             best, best_val = self.elite_strategy(pop, evaluated_pop)
             pop = self.selection(pop, evaluated_pop)[0]
-            pop = self.mutation(np.array(pop))
-            pop = self.inversion(np.array(pop))
+            pop = self.crossing(pop)
+            pop = self.mutation(pop)
+            #pop = self.inversion(pop)
             evaluated_pop = base.evaluate_population(pop)
-            pop.append(best)
-            evaluated_pop.append(best_val)
-            best_solution_in_epochs.append(Selection.best(pop, evaluated_pop, 5, self.is_max))
-            solution_mean.append((sum(evaluated_pop) / self.population_size))
+            pop = np.append(pop, best, axis=0)
+            evaluated_pop = np.append(evaluated_pop, best_val, axis=0)
+            best_solution_in_epochs.append([base.best_individual(pop, evaluated_pop, self.is_max), base.best_value(evaluated_pop, self.is_max)])
+            solution_mean.append((sum(evaluated_pop) / evaluated_pop.shape[0]))
+            print(sum(evaluated_pop) / evaluated_pop.shape[0])
             solution_std.append(np.std(evaluated_pop))
         return best_solution_in_epochs
 
     def selection(self, pop, evaluated_pop):
         if self.selection_type == SelectionType.BEST:
-            print(Selection.best(pop, evaluated_pop, self.selection_percent, self.is_max))
             return Selection.best(pop, evaluated_pop, self.selection_percent, self.is_max)
         elif self.selection_type == SelectionType.ROULETTE:
             return Selection.roulette(pop, evaluated_pop, self.selection_percent, self.is_max)
@@ -89,12 +91,15 @@ class GeneticAlgorithm:
     def elite_strategy(self, pop, evaluated_pop):
         return EliteStrategy.elite_strategy(pop, evaluated_pop,
                                             self.elite_strategy_percent,
-                                            self.elite_strategy_num, self.is_max)[0]
+                                            self.elite_strategy_num, self.is_max)
 
 
-lol = GeneticAlgorithm(bale_function, int(100), int(50), int(2), int(-4), int(4), float(0.001), SelectionType.BEST,
-                       MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT,
-                       True, int(80), int(10), int(40), int(10), int(10), int(50), int(5))
+lol = GeneticAlgorithm(bale_function, int(100), int(100), int(2), int(-4), int(4), float(0.001), SelectionType.BEST,
+                       MutationType.SINGLE_POINT, CrossingType.HOMOGENEOUS,
+                       True, float(0.9), float(0.1), float(0.9), float(0.1), int(10), int(80), int(10), int(0))
 
 a = lol.run_algorithm()
-print(a)
+haha = [x[1] for x in a]
+#print(haha)
+
+

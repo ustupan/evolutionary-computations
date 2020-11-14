@@ -16,8 +16,8 @@ class Inversion:
                 indexes = [random_index1, random_index2]
                 indexes.sort()
                 part_to_invert = pop[i][indexes[0]:indexes[1]]
-                part_to_invert = [0 if x == 1 else 1 for x in part_to_invert]
-                new_pop.append(np.concatenate((pop[i][:indexes[0]], part_to_invert, pop[i][indexes[1:]])))
+                part_to_invert = np.array([0 if x == 1 else 1 for x in part_to_invert])
+                new_pop.append(np.concatenate((pop[i][:indexes[0]], part_to_invert, pop[i][indexes[1]:])))
             else:
                 new_pop.append(pop[i])
-        return new_pop
+        return np.array(new_pop)

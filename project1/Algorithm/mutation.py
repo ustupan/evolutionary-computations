@@ -4,7 +4,6 @@ import numpy as np
 class Mutation:
     @staticmethod
     def point_mutation(pop, probability):
-        #print(pop)
         new_pop = []
         for i in range(pop.shape[0]):
             new_pop.append(pop[i])
@@ -15,7 +14,7 @@ class Mutation:
                     new_pop[i][random_locus] = 1
                 else:
                     new_pop[i][random_locus] = 0
-        return new_pop
+        return np.array(new_pop)
 
     @staticmethod
     def two_point_mutation(pop, probability):
@@ -36,7 +35,7 @@ class Mutation:
                     new_pop[i][random_locus2] = 1
                 else:
                     new_pop[i][random_locus2] = 0
-        return new_pop
+        return np.array(new_pop)
 
     @staticmethod
     def edge_mutation(pop, probability):
@@ -49,4 +48,4 @@ class Mutation:
                     new_pop[i][pop.shape[1] - 1] = 1
                 else:
                     new_pop[i][pop.shape[1] - 1] = 0
-        return new_pop
+        return np.array(new_pop)
