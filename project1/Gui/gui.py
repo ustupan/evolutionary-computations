@@ -1,12 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.ttk import Frame
+from tkmacosx import Button
 
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from tkmacosx import Button
+LEFT_FRAME_BACKGROUND_COLOR = "#FFFFFF"
+RIGHT_FRAME_BACKGROUND_COLOR = "#E5E5E5"
+RIGHT_FRAME_TITLE_COLOR = "#104FAF"
+RIGHT_FRAME_FONT_COLOR = "#1872FB"
 
 
 class MainApplication(tk.Frame):
@@ -16,31 +20,32 @@ class MainApplication(tk.Frame):
         self.master = master
         tk.Frame.__init__(self, self.master)
         self.box = tk.Entry(master)
-        self.width = self.master.winfo_screenwidth() / 1.25
+        self.width = self.master.winfo_screenwidth() / 1.45
         self.height = self.master.winfo_screenheight() / 1.25
+        self.max_min_method = tk.IntVar()
+        self.method = tk.IntVar()
         self.configure_gui()
-        self.create_widgets()
+        self.create_frames()
 
     def configure_gui(self):
         self.master.title("OE - Projekt nr 1")
         self.master.geometry("%ix%i" % (self.width, self.height))
-        self.master.configure(bg="skyblue")
+        self.master.configure(bg=LEFT_FRAME_BACKGROUND_COLOR)
         # self.master.resizable(0, 0)
 
-    def create_widgets(self):
-        self.create_frames()
-
     def create_frames(self):
-        self.left_frame = tk.Frame(width=self.width * 0.55, height=self.height - 20, background='red')
+        self.left_frame = tk.Frame(width=self.width * 0.50, height=self.height - 20,
+                                   background=LEFT_FRAME_BACKGROUND_COLOR)
         self.left_frame.grid(row=0, column=0)
         self.set_canvas_to_left_frame()
 
-        self.right_frame = tk.Frame(width=self.width * 0.45, height=self.height - 20, background='yellow')
+        self.right_frame = tk.Frame(width=self.width * 0.50, height=self.height - 20,
+                                    background=RIGHT_FRAME_BACKGROUND_COLOR)
         self.right_frame.grid(row=0, column=1)
         self.set_canvas_to_right_frame()
 
     def set_canvas_to_left_frame(self):
-        left_canvas = tk.Canvas(self.left_frame, width=self.width * 0.45 - 15, height=self.height - 20,
+        left_canvas = tk.Canvas(self.left_frame, width=self.width * 0.50, height=self.height - 20,
                                 highlightthickness=0,
                                 background="white")
 
@@ -60,12 +65,13 @@ class MainApplication(tk.Frame):
         left_scrollbar.pack(side="right", fill="y", pady=10)
 
     def set_canvas_to_right_frame(self):
-        right_canvas = tk.Canvas(self.right_frame, width=self.width * 0.55 - 15, height=self.height - 20,
+        right_canvas = tk.Canvas(self.right_frame, width=self.width * 0.50 - 30, height=self.height - 20,
                                  highlightthickness=0,
-                                 background="blue")
+                                 background=RIGHT_FRAME_BACKGROUND_COLOR)
 
-        right_scrollbar = tk.Scrollbar(self.right_frame, orient="vertical", command=right_canvas.yview)
-        self.right_scrollable_frame = tk.Frame(right_canvas, background="#b3d9ff")
+        right_scrollbar = tk.Scrollbar(self.right_frame, orient="vertical", command=right_canvas.yview,
+                                       bg=RIGHT_FRAME_BACKGROUND_COLOR)
+        self.right_scrollable_frame = tk.Frame(right_canvas, background=RIGHT_FRAME_BACKGROUND_COLOR)
 
         self.right_scrollable_frame.bind(
             "<Configure>",
@@ -83,64 +89,159 @@ class MainApplication(tk.Frame):
         right_scrollbar.pack(side="right", fill="y", pady=10)
 
     def create_right_frame_widgets(self):
-        self.combo = ttk.Combobox(self.right_scrollable_frame, values=("Maksymalizacja", "Minimalizacja"))
-        self.combo.set("Maksymalizacja")
-        self.combo.grid(row=1, column=1)
-
-        self.combo.bind("<<ComboboxSelected>>", self.justamethod)
-
         self.set_lables_right_frame()
+        self.create_radio_button("Maksymalizacja", 1, self.max_min_method, 1, 1, "W")
+        self.create_radio_button("Minimalizacja", 2, self.max_min_method, 1, 1, "E")
 
-        self.button2 = tk.Button(self.right_scrollable_frame, text='Button4', highlightbackground='#3E4149',
-                                 command=self.plot, width=round(self.width * 0.55 - 500))
-        self.button2.grid(row=13, columnspan=2, sticky="S")
-        #
-        # self.button1 = Button(self.right_frame, text='Button3', borderless=1)
-        # self.button1.grid(row=1, column=0)
+        x1_from_range = self.create_spinbox(-100, 100, 1, 11, "normal")
+        x1_from_range.grid(row=2, column=0, padx=(0, 112), sticky="E")
 
-        # for i in range(40):
-        #     self.button2 = tk.Button(self.right_scrollable_frame, text='Button4', highlightbackground='#3E4149',
-        #                              command=self.plot)
-        #     self.button2.grid(row=i, column=1)
-        #
-        #     self.button3 = tk.Button(self.right_scrollable_frame, text='Button5', command=self.plot)
-        #     self.button3.grid(row=i, column=2)
+        x1_to_range = self.create_spinbox(-100, 100, 1, 11, "normal")
+        x1_to_range.grid(row=2, column=0, padx=(0, 10), sticky="E")
+
+        x2_from_range = self.create_spinbox(-100, 100, 1, 11, "normal")
+        x2_from_range.grid(row=3, column=0, padx=(0, 112), sticky="E")
+
+        x2_to_range = self.create_spinbox(-100, 100, 1, 11, "normal")
+        x2_to_range.grid(row=3, column=0, padx=(0, 10), sticky="E")
+
+        chromosome_precision = self.create_spinbox(0, 1, 0.01, 28, "normal")
+        chromosome_precision.grid(row=5, column=0, padx=(0, 10), sticky="E")
+
+        population_size = self.create_spinbox(0, 1000, 1, 28, "normal")
+        population_size.grid(row=6, column=0, padx=(0, 10), sticky="E")
+
+        num_of_epoch = self.create_spinbox(0, 1000, 1, 28, "normal")
+        num_of_epoch.grid(row=7, column=0, padx=(0, 10), sticky="E")
+
+        self.selection_option = ttk.Combobox(self.right_scrollable_frame,
+                                             values=("Selekcja najlepszych", "Koło ruletki", "Selekcja turniejowa"),
+                                             width=20)
+        self.selection_option.set("-- Nie wybrano --")
+        self.selection_option.bind("<<ComboboxSelected>>", self.justamethod)
+        self.selection_option.grid(row=8, column=0, padx=(0, 18), sticky="E")
+
+        self.crossing_option = ttk.Combobox(self.right_scrollable_frame,
+                                            values=("Jednopunktowe", "Dwupunktowe",
+                                                    "Trzypunktowe", "Jednorodne"),
+                                            width=20)
+        self.crossing_option.set("-- Nie wybrano --")
+        self.crossing_option.bind("<<ComboboxSelected>>", self.justamethod)
+        self.crossing_option.grid(row=9, column=0, padx=(0, 18), sticky="E")
+
+        crossing_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        crossing_precision.grid(row=10, column=0, padx=(0, 10), sticky="E")
+
+        self.mutation_option = ttk.Combobox(self.right_scrollable_frame,
+                                            values=("Brzegowa", "Jednopunktowa",
+                                                    "Dwupunktowa"),
+                                            width=20)
+        self.mutation_option.set("-- Nie wybrano --")
+        self.mutation_option.bind("<<ComboboxSelected>>", self.justamethod)
+        self.mutation_option.grid(row=11, column=0, padx=(0, 18), sticky="E")
+
+        mutation_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        mutation_precision.grid(row=12, column=0, padx=(0, 10), sticky="E")
+
+        inversion_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        inversion_precision.grid(row=13, column=0, padx=(0, 10), sticky="E")
+
+        self.population_procent = self.create_spinbox(0, 100, 1, 28, "disable")
+        self.population_procent.grid(row=14, column=0, padx=(0, 10), sticky="E")
+
+        self.normal_or_disabled()
+
+        self.population_size = self.create_spinbox(0, 1000, 1, 28, "disable")
+        self.population_size.grid(row=15, column=0, padx=(0, 10), sticky="E")
+
+        self.button2 = Button(self.right_scrollable_frame, text="Start", bg=RIGHT_FRAME_FONT_COLOR, fg="white",
+                              borderless=1,
+                              takefocus=0, width=round(self.width * 0.55 - 100), command=self.plot)
+        self.button2.grid(row=16, columnspan=2, pady=15, sticky="S")
 
     def set_lables_right_frame(self):
-        title = self.create_label("Algorytm genetyczny znajdujący maks/min w Funkcji Beale", 0)
-        optimization_label = self.create_label("Maksymalizajca/Minimalizacja funkcji", 1)
-        range_of_X1 = self.create_label("Przedział X1 funkcji", 2)
-        range_of_X2 = self.create_label("Przedział X2 funkcji", 3)
-        chromosome_accuracy = self.create_label("Dokładności chromosomu", 4)
-        population_size = self.create_label("Wielkości populacji", 5)
-        age_value = self.create_label("Liczba epok", 6)
-        selection_method = self.create_label("Metoda selekcji", 7)
-        crossing_method = self.create_label("Krzyżowanie", 8)
-        crossing_method_probability = self.create_label("Prawdopodobieństwo krzyżowania", 9)
-        mutation_method = self.create_label("Mutacja", 10)
-        mutation_method_probability = self.create_label("Prawdopodobieństwo mutacji", 11)
-        inversion_method_probability = self.create_label("Prawdopodobieństwo inwersji", 12)
+        self.crate_title_label(0)
+        self.create_label("Przedział X1 funkcji", 2)
+        self.create_label("Przedział X2 funkcji", 3)
+        self.create_label("Dokładności chromosomu", 5)
+        self.create_label("Wielkości populacji", 6)
+        self.create_label("Liczba epok", 7)
+        self.create_label("Metoda selekcji", 8)
+        self.create_label("Krzyżowanie", 9)
+        self.create_label("Prawdopodobieństwo krzyżowania", 10)
+        self.create_label("Mutacja", 11)
+        self.create_label("Prawdopodobieństwo mutacji", 12)
+        self.create_label("Prawdopodobieństwo inwersji", 13)
+        self.create_radio_button("Procent osobników", 3, self.method, 14, 1, "W")
+        self.create_radio_button("Liczba osobników", 4, self.method, 15, 1, "W")
+
+    def crate_title_label(self, row):
+        return tk.Label(self.right_scrollable_frame,
+                        text="Algorytm genetyczny znajdujący maks/min w Funkcji Beale",
+                        font="system-ui 15 bold",
+                        bg=RIGHT_FRAME_BACKGROUND_COLOR, fg=RIGHT_FRAME_TITLE_COLOR).grid(row=row, column=0, padx=20,
+                                                                                          pady=5,
+                                                                                          sticky="N")
 
     def create_label(self, title, row):
         return tk.Label(self.right_scrollable_frame,
                         text=title,
-                        font="system-ui 13 bold",
-                        bg="#b3d9ff", fg="#0066cc").grid(row=row, column=0, padx=0, pady=10, sticky="W")
+                        font="system-ui 12 bold",
+                        bg=RIGHT_FRAME_BACKGROUND_COLOR, fg=RIGHT_FRAME_FONT_COLOR).grid(row=row, column=0, padx=20,
+                                                                                         pady=10,
+                                                                                         sticky="W")
 
-        # self.button3 = tk.Button(self.right_scrollable_frame, text='Button5', command=self.plot)
-        # self.button3.grid(row=1, column=2, padx=(150, 0))
+    def create_spinbox(self, _from, _to, _increment, width, state):
+        return tk.Spinbox(self.right_scrollable_frame, from_=_from, to=_to,
+                          increment=_increment,
+                          textvariable=tk.DoubleVar(value=0),
+                          font="SYSTEM-UI 10",
+                          bg="#FFFFFF",
+                          fg='#000000',
+                          width=width,
+                          state=state)
+
+    def create_radio_button(self, title, val, variable, row, column, place):
+        s = ttk.Style()
+        s.configure("Wild.TRadiobutton",
+                    foreground=RIGHT_FRAME_FONT_COLOR,
+                    font="system-ui 12 bold")
+
+        return ttk.Radiobutton(self.right_scrollable_frame,
+                               text=title,
+                               style="Wild.TRadiobutton",
+                               value=val, variable=variable,
+                               command=lambda: self.clicked()).grid(row=row, columnspan=column, padx=(20, 20), pady=10,
+                                                                    sticky=place)
 
     def justamethod(self, event):
-        print("method is called: choosen -> ", self.combo.get())
+        print("method is called: choosen -> ", self.selection_option.get())
+        print("selection is called: choosen -> ", self.selection_option.get())
+        print("crossing is called: choosen -> ", self.crossing_option.get())
+        print("crossing is called: choosen -> ", self.mutation_option.get())
+
+    def clicked(self):
+        self.normal_or_disabled()
+        print(self.max_min_method.get())
+        print(self.method.get())
+
+    def normal_or_disabled(self):
+        if self.method.get() == 3:
+            self.population_procent.configure(state="normal")
+            self.population_size.configure(state="disable")
+        elif self.method.get() == 4:
+            self.population_procent.configure(state="disable")
+            self.population_size.configure(state="normal")
 
     def plot(self):
         x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        p = np.array([16.23697, 17.31653, 17.22094, 17.68631, 17.73641, 18.6368, 19.32125, 19.31756, 21.20247, 22.41444,
-                      22.11718, 22.12453])
+        p = np.array(
+            [16.23697, 17.31653, 17.22094, 17.68631, 17.73641, 18.6368, 19.32125, 19.31756, 21.20247, 22.41444,
+             22.11718, 22.12453])
 
         fig = Figure(figsize=(5, 5))
         a = fig.add_subplot(111)
-        a.plot(p, range(2 + max(x)), color='blue')
+        a.plot(p, range(2 + max(x)), color="blue")
 
         a.set_title("Estimation Grid", fontsize=12)
         a.set_ylabel("Y", fontsize=10)
@@ -159,7 +260,7 @@ class MainApplication(tk.Frame):
         canvas2.draw()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = tk.Tk()
     main_app = MainApplication(root)
     root.mainloop()
