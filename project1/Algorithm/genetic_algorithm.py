@@ -1,12 +1,12 @@
 import numpy as np
-from Algorithm.base import *
-from Helpers.enums import *
-from Algorithm.selection import *
-from Algorithm.mutation import *
-from Algorithm.crossing import *
-from Algorithm.inversion import *
-from Algorithm.elite_strategy import *
-from Algorithm.beale_function import *
+from project1.Algorithm.base import *
+from project1.Helpers.enums import *
+from project1.Algorithm.selection import *
+from project1.Algorithm.mutation import *
+from project1.Algorithm.crossing import *
+from project1.Algorithm.inversion import *
+from project1.Algorithm.elite_strategy import *
+from project1.Algorithm.beale_function import *
 
 
 class GeneticAlgorithm:
@@ -89,7 +89,7 @@ class GeneticAlgorithm:
         elif self.crossing_type == CrossingType.DOUBLE_POINT:
             return Crossing.two_point_crossing(pop, self.crossing_prob)
         elif self.crossing_type == CrossingType.TRIPLE_POINT:
-            return Crossing.two_point_crossing(pop, self.crossing_prob)
+            return Crossing.three_point_crossing(pop, self.crossing_prob)
         elif self.crossing_type == CrossingType.HOMOGENEOUS:
             return Crossing.homogeneous_crossing(pop, self.crossing_prob)
 
