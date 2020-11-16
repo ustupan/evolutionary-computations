@@ -4,8 +4,7 @@ import numpy as np
 class Selection:
     @staticmethod
     def best(pop, evaluated_pop, percent, is_max=True, num=0, is_elite_strategy=False):
-        num_of_selected = 0
-        pop_not_selected_indexes = [i for i in range(0,pop.shape[0])]
+        pop_not_selected_indexes = [i for i in range(0, pop.shape[0])]
         if num == 0:
             num_of_selected = np.math.ceil(evaluated_pop.size * percent * 0.01)
         else:

@@ -8,4 +8,4 @@ class EliteStrategy:
         if percent != 0:
             return Algorithm.selection.Selection.best(pop, evaluated_pop, percent, is_max, 0, True)
         else:
-            return Algorithm.selection.Selection.best(pop, evaluated_pop, 0, is_max, num)
+            return Algorithm.selection.Selection.best(pop, evaluated_pop, 0, is_max, num, True)
