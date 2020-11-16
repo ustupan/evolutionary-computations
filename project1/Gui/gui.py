@@ -7,6 +7,10 @@ import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from Algorithm.beale_function import bale_function
+from Algorithm.genetic_algorithm import GeneticAlgorithm
+from Helpers.enums import SelectionType, MutationType, CrossingType
+
 LEFT_FRAME_BACKGROUND_COLOR = "#FFFFFF"
 RIGHT_FRAME_BACKGROUND_COLOR = "#E5E5E5"
 RIGHT_FRAME_TITLE_COLOR = "#104FAF"
@@ -93,8 +97,8 @@ class MainApplication(tk.Frame):
         self.create_radio_button("Maksymalizacja", 1, self.max_min_method, 1, 1, "W")
         self.create_radio_button("Minimalizacja", 2, self.max_min_method, 1, 1, "E")
 
-        x1_from_range = self.create_spinbox(-100, 100, 1, 11, "normal")
-        x1_from_range.grid(row=2, column=0, padx=(0, 112), sticky="E")
+        self.x1_from_range = self.create_spinbox(-100, 100, 1, 11, "normal")
+        self.x1_from_range.grid(row=2, column=0, padx=(0, 112), sticky="E")
 
         x1_to_range = self.create_spinbox(-100, 100, 1, 11, "normal")
         x1_to_range.grid(row=2, column=0, padx=(0, 10), sticky="E")
@@ -105,14 +109,14 @@ class MainApplication(tk.Frame):
         x2_to_range = self.create_spinbox(-100, 100, 1, 11, "normal")
         x2_to_range.grid(row=3, column=0, padx=(0, 10), sticky="E")
 
-        chromosome_precision = self.create_spinbox(0, 1, 0.01, 28, "normal")
-        chromosome_precision.grid(row=5, column=0, padx=(0, 10), sticky="E")
+        self.chromosome_precision = self.create_spinbox(0, 1, 0.01, 28, "normal")
+        self.chromosome_precision.grid(row=5, column=0, padx=(0, 10), sticky="E")
 
-        population_size = self.create_spinbox(0, 1000, 1, 28, "normal")
-        population_size.grid(row=6, column=0, padx=(0, 10), sticky="E")
+        self.population_size = self.create_spinbox(0, 1000, 1, 28, "normal")
+        self.population_size.grid(row=6, column=0, padx=(0, 10), sticky="E")
 
-        num_of_epoch = self.create_spinbox(0, 1000, 1, 28, "normal")
-        num_of_epoch.grid(row=7, column=0, padx=(0, 10), sticky="E")
+        self.num_of_epoch = self.create_spinbox(0, 1000, 1, 28, "normal")
+        self.num_of_epoch.grid(row=7, column=0, padx=(0, 10), sticky="E")
 
         self.selection_option = ttk.Combobox(self.right_scrollable_frame,
                                              values=("Selekcja najlepszych", "Koło ruletki", "Selekcja turniejowa"),
@@ -129,8 +133,8 @@ class MainApplication(tk.Frame):
         self.crossing_option.bind("<<ComboboxSelected>>", self.justamethod)
         self.crossing_option.grid(row=9, column=0, padx=(0, 18), sticky="E")
 
-        crossing_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
-        crossing_precision.grid(row=10, column=0, padx=(0, 10), sticky="E")
+        self.crossing_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        self.crossing_precision.grid(row=10, column=0, padx=(0, 10), sticky="E")
 
         self.mutation_option = ttk.Combobox(self.right_scrollable_frame,
                                             values=("Brzegowa", "Jednopunktowa",
@@ -140,11 +144,11 @@ class MainApplication(tk.Frame):
         self.mutation_option.bind("<<ComboboxSelected>>", self.justamethod)
         self.mutation_option.grid(row=11, column=0, padx=(0, 18), sticky="E")
 
-        mutation_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
-        mutation_precision.grid(row=12, column=0, padx=(0, 10), sticky="E")
+        self.mutation_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        self.mutation_precision.grid(row=12, column=0, padx=(0, 10), sticky="E")
 
-        inversion_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
-        inversion_precision.grid(row=13, column=0, padx=(0, 10), sticky="E")
+        self.inversion_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
+        self.inversion_precision.grid(row=13, column=0, padx=(0, 10), sticky="E")
 
         self.population_procent = self.create_spinbox(0, 100, 1, 28, "disable")
         self.population_procent.grid(row=14, column=0, padx=(0, 10), sticky="E")
@@ -172,6 +176,11 @@ class MainApplication(tk.Frame):
         self.create_label("Mutacja", 11)
         self.create_label("Prawdopodobieństwo mutacji", 12)
         self.create_label("Prawdopodobieństwo inwersji", 13)
+        # self.create_label("Liczba zmiennych funkcji") -> 1,2,3,4,5
+        # self.create_label("Wielkosc turnieju") -> 1,2,3,4,5
+        # self.create_label("Procent osobnikow w Strategii elitarnej")
+        # self.create_label("Liczba osobnikow w Strategii elitarnej")
+
         self.create_radio_button("Procent osobników", 3, self.method, 14, 1, "W")
         self.create_radio_button("Liczba osobników", 4, self.method, 15, 1, "W")
 
@@ -219,6 +228,31 @@ class MainApplication(tk.Frame):
         print("selection is called: choosen -> ", self.selection_option.get())
         print("crossing is called: choosen -> ", self.crossing_option.get())
         print("crossing is called: choosen -> ", self.mutation_option.get())
+        print(" self.chromosome_precision, ", self.chromosome_precision.get())
+        print(" self.population_procent", self.population_procent.get())
+        print("self.mutation_precision", self.mutation_precision.get())
+
+    def get_seletced_parameters(self):
+        # w tej funkcji trzeba zwrocic wszystkie parametry ustawione
+        # num_of_epochs
+        # population_size
+        # num_of_variables
+        # range_min
+        # range_max
+        # precision
+        # selection_type <- sa enumy w Helpers/enums.py
+        # mutation_type
+        # crossing_type
+        # is_max <- czy szukamy min czy max funkcji
+        # selection_prob
+        # mutation_prob
+        # crossing_prob
+        # inversion_prob
+        # tournament_size
+        # selection_percent
+        # elite_strategy_percent ALBO percent albo num jak uzytkownik ustawi dwa to do ktoregos trzeba dac 0 :)
+        # elite_strategy_num
+        return 50, 100, 2, -4, 4, 0.0001, SelectionType.ROULETTE, MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT, False, 0.9, 0.1, 0.9, 0.1, 3, 80, 10, 0
 
     def clicked(self):
         self.normal_or_disabled()
@@ -234,6 +268,16 @@ class MainApplication(tk.Frame):
             self.population_size.configure(state="normal")
 
     def plot(self):
+        # dodac Label z liczeniem czasu
+        # czas start...
+        algorithm = GeneticAlgorithm(bale_function, *self.get_seletced_parameters())
+        best_solution_in_epochs, solution_mean, solution_std = algorithm.run_algorithm()
+        # czas koniec
+        # wyswietlic czas obliczen
+        x = np.array([x+1 for x in range(0, len(best_solution_in_epochs))])
+        # x to jest [1,2,3,4,6,7] itd kolejne epoki
+
+        print(x)
         x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         p = np.array(
             [16.23697, 17.31653, 17.22094, 17.68631, 17.73641, 18.6368, 19.32125, 19.31756, 21.20247, 22.41444,
