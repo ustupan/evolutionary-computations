@@ -22,9 +22,10 @@ class Crossing:
     @staticmethod
     def two_point_crossing(pop, probability):
         new_pop = []
-        if pop.shape[0] == 1:
-            return np.array(pop)
-        for i in range(0, (pop.shape[0] // 2) + 1, 2):
+        for i in range(0, pop.shape[0], 2):
+            if i == pop.shape[0] - 1:
+                new_pop.append(pop[i])
+                break
             rnd = np.random.random()
             if rnd < probability:
                 pivot1 = np.random.randint(1, pop.shape[1] - 1)
@@ -45,8 +46,10 @@ class Crossing:
     @staticmethod
     def three_point_crossing(pop, probability):
         new_pop = []
-        if pop.shape[0] == 1: return np.array(pop)
-        for i in range(0, (pop.shape[0] // 2) + 1, 2):
+        for i in range(0, pop.shape[0], 2):
+            if i == pop.shape[0] - 1:
+                new_pop.append(pop[i])
+                break
             rnd = np.random.random()
             if rnd < probability:
                 pivots = set()
@@ -66,8 +69,10 @@ class Crossing:
     @staticmethod
     def homogeneous_crossing(pop, probability):
         new_pop = []
-        if pop.shape[0] == 1: return np.array(pop)
-        for i in range(0, (pop.shape[0] // 2) + 1, 2):
+        for i in range(0, pop.shape[0], 2):
+            if i == pop.shape[0] - 1:
+                new_pop.append(pop[i])
+                break
             rnd = np.random.random()
             ch1 = []
             ch2 = []

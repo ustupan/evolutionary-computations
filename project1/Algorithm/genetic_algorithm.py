@@ -52,12 +52,22 @@ class GeneticAlgorithm:
             pop = self.mutation(pop)
             pop = self.inversion(pop)
             evaluated_pop = base.evaluate_population(pop)
-          #  pop = np.append(pop, best, axis=0)
-          #  evaluated_pop = np.append(evaluated_pop, best_val, axis=0)
+
+            indexes_to_delete = set()
+            while len(indexes_to_delete) != best.shape[0]:
+                indexes_to_delete.add(np.random.randint(1, pop.shape[1] - 1))
+            indexes_to_delete = list(indexes_to_delete)
+            pop = np.delete(pop, indexes_to_delete, axis=0)
+            evaluated_pop = np.delete(evaluated_pop, indexes_to_delete, axis=0)
+            pop = np.append(pop, best, axis=0)
+            evaluated_pop = np.append(evaluated_pop, best_val, axis=0)
+
             best_solution_in_epochs.append(
                 [base.best_individual(pop, evaluated_pop, self.is_max), base.best_value(evaluated_pop, self.is_max)])
             solution_mean.append((sum(evaluated_pop) / evaluated_pop.shape[0]))
             solution_std.append(np.std(evaluated_pop))
+            print(sum(evaluated_pop) / evaluated_pop.shape[0])
+           # print(base.best_value(evaluated_pop, self.is_max))
         return best_solution_in_epochs
 
     def selection(self, pop, evaluated_pop):
@@ -95,9 +105,10 @@ class GeneticAlgorithm:
                                             self.elite_strategy_num, self.is_max)
 
 
-lol = GeneticAlgorithm(bale_function, int(100), int(100), int(1), int(-4), int(4), float(0.001), SelectionType.BEST,
-                       MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT,
-                       True, float(0.9), float(0.10), float(0.9), float(0.1), int(10), int(80), int(10), int(0))
+lol = GeneticAlgorithm(bale_function, int(100), int(100), int(2), int(-4), int(4), float(0.001),
+                       SelectionType.BEST,
+                       MutationType.EDGE, CrossingType.TRIPLE_POINT,
+                       True, float(0.9), float(0.10), float(0.9), float(0.1), int(3), int(80), int(0), int(1))
 
 a = lol.run_algorithm()
 haha = [x[1] for x in a]
