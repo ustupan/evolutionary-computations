@@ -18,3 +18,4 @@ class MutationType(Enum):
     EDGE = 1
     SINGLE_POINT = 2
     DOUBLE_POINT = 3
+

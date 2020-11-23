@@ -41,8 +41,8 @@ class GeneticAlgorithm:
         pop = base.generate_population()
         evaluated_pop = base.evaluate_population(pop)
         best_solution_in_epochs = []
-        solution_mean = [(sum(evaluated_pop) / self.population_size)]
-        solution_std = [(sum(evaluated_pop) / self.population_size)]
+        solution_mean = []
+        solution_std = []
         for epoch in range(self.num_of_epochs):
             evaluated_pop = base.evaluate_population(pop)
             best, best_val = self.elite_strategy(pop, evaluated_pop)
