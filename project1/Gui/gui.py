@@ -40,7 +40,7 @@ class MainApplication(tk.Frame):
         self.master.title("OE - Projekt nr 1")
         self.master.geometry("%ix%i" % (self.width, self.height))
         self.master.configure(bg=LEFT_FRAME_BACKGROUND_COLOR)
-        # self.master.resizable(0, 0)
+        self.master.resizable(0, 0)
 
     def create_frames(self):
         self.left_frame = tk.Frame(width=self.width * 0.50, height=self.height - 20,
@@ -311,6 +311,7 @@ class MainApplication(tk.Frame):
         canvas_best = FigureCanvasTkAgg(fig_best, master=self.left_scrollable_frame)
         canvas_best.get_tk_widget().grid(column=0, row=0)
         canvas_best.draw()
+        fig_best.savefig('../Plots/wartosc_funkcji.png')
 
         # ----------------------------------------------------------------------
 
@@ -325,6 +326,7 @@ class MainApplication(tk.Frame):
         canvas_mean = FigureCanvasTkAgg(fig_mean, master=self.left_scrollable_frame)
         canvas_mean.get_tk_widget().grid(column=0, row=1)
         canvas_mean.draw()
+        fig_mean.savefig('../Plots/srednie_wartosci_funkcji.png')
 
         # ----------------------------------------------------------------------
 
@@ -339,6 +341,8 @@ class MainApplication(tk.Frame):
         canvas_std = FigureCanvasTkAgg(fig_std, master=self.left_scrollable_frame)
         canvas_std.get_tk_widget().grid(column=0, row=2)
         canvas_std.draw()
+        fig_std.savefig('../Plots/odchylenie_standardowe.png')
+
 
 
 if __name__ == "__main__":
