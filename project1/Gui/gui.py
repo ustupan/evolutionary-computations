@@ -194,7 +194,8 @@ class MainApplication(tk.Frame):
                                                                                          sticky="W")
 
     def create_time_label(self, text):
-        self.time_label = tk.Label(self.right_scrollable_frame, text="Obliczenia wykonały się w : %.5g sekund" % text, font="system-ui 12 bold",
+        self.time_label = tk.Label(self.right_scrollable_frame, text="Obliczenia wykonały się w : %.5g sekund" % text,
+                                   font="system-ui 12 bold",
                                    bg=RIGHT_FRAME_BACKGROUND_COLOR, fg=RIGHT_FRAME_FONT_COLOR).grid(row=19, column=0,
                                                                                                     padx=20, pady=10,
                                                                                                     sticky="W")
@@ -224,26 +225,6 @@ class MainApplication(tk.Frame):
                                                                                sticky=place)
 
     def get_seletced_parameters(self):
-        # w tej funkcji trzeba zwrocic wszystkie parametry ustawione
-        # num_of_variables
-        # range_min
-        # range_max
-        # precision
-        # selection_type <- sa enumy w Helpers/enums.py
-        # mutation_type
-        # crossing_type
-        # is_max <- czy szukamy min czy max funkcji
-        # selection_prob
-        # mutation_prob
-        # crossing_prob
-        # inversion_prob
-        # tournament_size
-        # selection_percent
-        # elite_strategy_percent ALBO percent albo num jak uzytkownik ustawi dwa to do ktoregos trzeba dac 0 :)
-        # elite_strategy_num
-        return 50, 100, 2, -4, 4, 0.0001, SelectionType.ROULETTE, MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT, False, 0.9, 0.1, 0.9, 0.1, 3, 80, 10, 0
-
-    def clicked(self):
         is_max = self.max_min_method.get()
         from_x1 = self.range_min.get()
         to_x1 = self.range_max.get()
@@ -258,9 +239,9 @@ class MainApplication(tk.Frame):
         invers_precision = self.inversion_precision.get()
         fun_variables_num = self.num_of_function_variables.get()
         tour_size = self.tournament_size.get()
+        pop_procent = self.population_procent.get()
         elit_strategy_pop_procent = self.elit_strategy_population_procent.get()
         elit_strategy_pop_size = self.elit_strategy_population_size.get()
-        pop_procent = self.population_procent.get()
 
         for i in range(len(SELECTION_TYPE)):
             if select_type == SELECTION_TYPE[i]:
@@ -288,10 +269,9 @@ class MainApplication(tk.Frame):
         # print(invers_precision)
         # print(fun_variables_num)
         # print(tour_size)
+        # print(pop_procent)
         # print(elit_strategy_pop_procent)
         # print(elit_strategy_pop_size)
-        # print(pop_procent)
-        # print(pop_checkbox_size)
 
         return int(epoch_num), int(pop_size), int(fun_variables_num), int(from_x1), int(
             to_x1), float(chrom_precision), select_type, mut_type, cross_type, is_max, float(1), float(
@@ -308,7 +288,7 @@ class MainApplication(tk.Frame):
 
     def plot(self):
         start_time = datetime.now()
-        algorithm = GeneticAlgorithm(bale_function, *self.clicked())
+        algorithm = GeneticAlgorithm(bale_function, *self.get_seletced_parameters())
         best_solution_in_epochs, solution_mean, solution_std = algorithm.run_algorithm()
         print(len(best_solution_in_epochs))
         print(len(solution_mean))
@@ -317,30 +297,52 @@ class MainApplication(tk.Frame):
 
         self.create_time_label((end_time - start_time).total_seconds())
 
-        x = np.array([x + 1 for x in range(0, len(solution_std))])
-        p = np.array(solution_std)
+        x = np.array([x + 1 for x in range(0, len(best_solution_in_epochs))])
+        best = np.array(best_solution_in_epochs)
+        mean = np.array(solution_mean)
+        std = np.array(solution_std)
 
+        # ----------------------------------------------------------------------
 
-        fig = Figure(figsize=(5, 5))
-        a = fig.add_subplot(111)
+        fig_best = Figure(figsize=(5, 5))
+        b = fig_best.add_subplot(111)
+        b.plot(x, best, color="blue")
 
-        a.plot(x, p, color="blue")
+        b.set_title("Wartości funkcji", fontsize=12)
+        b.set_ylabel("Y", fontsize=10)
+        b.set_xlabel("X", fontsize=10)
 
-        a.set_title("Wartość najlepszego osobnika w epoce", fontsize=12)
-        a.set_ylabel("Y", fontsize=10)
-        a.set_xlabel("X", fontsize=10)
+        canvas_best = FigureCanvasTkAgg(fig_best, self.left_scrollable_frame)
+        canvas_best.get_tk_widget().grid(column=0, row=0)
+        canvas_best.draw()
 
-        canvas0 = FigureCanvasTkAgg(fig, self.left_scrollable_frame)
-        canvas0.get_tk_widget().grid(column=0, row=0)
-        canvas0.draw()
+        # ----------------------------------------------------------------------
 
-        # canvas1 = FigureCanvasTkAgg(fig, self.left_scrollable_frame)
-        # canvas1.get_tk_widget().grid(column=0, row=1)
-        # canvas1.draw()
-        #
-        # canvas2 = FigureCanvasTkAgg(fig, self.left_scrollable_frame)
-        # canvas2.get_tk_widget().grid(column=0, row=2)
-        # canvas2.draw()
+        fig_mean = Figure(figsize=(5, 5))
+        m = fig_mean.add_subplot(111)
+        m.plot(x, mean, color="blue")
+
+        m.set_title("Średnie wartości funkcji", fontsize=12)
+        m.set_ylabel("Y", fontsize=10)
+        m.set_xlabel("X", fontsize=10)
+
+        canvas_mean = FigureCanvasTkAgg(fig_mean, self.left_scrollable_frame)
+        canvas_mean.get_tk_widget().grid(column=0, row=1)
+        canvas_mean.draw()
+
+        # ----------------------------------------------------------------------
+
+        fig_std = Figure(figsize=(5, 5))
+        s = fig_std.add_subplot(111)
+        s.plot(x, std, color="blue")
+
+        s.set_title("Odchylenie standardowe", fontsize=12)
+        s.set_ylabel("Y", fontsize=10)
+        s.set_xlabel("X", fontsize=10)
+
+        canvas_std = FigureCanvasTkAgg(fig_std, self.left_scrollable_frame)
+        canvas_std.get_tk_widget().grid(column=0, row=2)
+        canvas_std.draw()
 
 
 if __name__ == "__main__":
