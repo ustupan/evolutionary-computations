@@ -1,18 +1,20 @@
 import numpy as np
-from project1.Algorithm.base import *
-from project1.Helpers.enums import *
-from project1.Algorithm.selection import *
-from project1.Algorithm.mutation import *
-from project1.Algorithm.crossing import *
-from project1.Algorithm.inversion import *
-from project1.Algorithm.elite_strategy import *
-from project1.Algorithm.beale_function import *
+from Algorithm.base import *
+from Algorithm.real_representation_base import Real_Representation_Base
+from Helpers.enums import *
+from Algorithm.selection import *
+from Algorithm.mutation import *
+from Algorithm.crossing import *
+from Algorithm.inversion import *
+from Algorithm.elite_strategy import *
+from Algorithm.beale_function import *
 
 
 class GeneticAlgorithm:
     def __init__(self, func, num_of_epochs, population_size, num_of_variables, range_min,
                  range_max, precision, selection_type, mutation_type, crossing_type, is_max,
-                 selection_prob, mutation_prob, crossing_prob, inversion_prob, tournament_size=0,
+                 selection_prob, mutation_prob, crossing_prob, inversion_prob,  even_mutation_min=0,
+                 even_mutation_max = 0, tournament_size=0,
                  selection_percent=0, elite_strategy_percent=0, elite_strategy_num=0):
         self.func = func
         self.num_of_epochs = num_of_epochs
@@ -33,11 +35,18 @@ class GeneticAlgorithm:
         self.selection_percent = selection_percent
         self.elite_strategy_percent = elite_strategy_percent
         self.elite_strategy_num = elite_strategy_num
+        self.even_mutation_min = even_mutation_min
+        self.even_mutation_max = even_mutation_max
 
     def run_algorithm(self):
 
-        base = Base(self.func, self.population_size, self.num_of_variables, self.range_min,
-                    self.range_max, self.precision)
+        # binary representation
+        # base = Base(self.func, self.population_size, self.num_of_variables, self.range_min,
+        #            self.range_max, self.precision)
+
+        base = Real_Representation_Base(self.func, self.population_size, self.num_of_variables, self.range_min,
+                                        self.range_max, self.precision)
+
         pop = base.generate_population()
         evaluated_pop = base.evaluate_population(pop)
         best_solution_in_epochs = []
@@ -55,7 +64,7 @@ class GeneticAlgorithm:
 
             indexes_to_delete = set()
             while len(indexes_to_delete) != best.shape[0]:
-                indexes_to_delete.add(np.random.randint(1, pop.shape[1] - 1))
+                indexes_to_delete.add(np.random.randint(1, pop.shape[0] - 1))
             indexes_to_delete = list(indexes_to_delete)
             pop = np.delete(pop, indexes_to_delete, axis=0)
             evaluated_pop = np.delete(evaluated_pop, indexes_to_delete, axis=0)
@@ -82,6 +91,8 @@ class GeneticAlgorithm:
             return Mutation.two_point_mutation(pop, self.mutation_prob)
         elif self.mutation_type == MutationType.EDGE:
             return Mutation.edge_mutation(pop, self.mutation_prob)
+        elif self.mutation_type == MutationType.EVEN:
+            return Mutation.even_mutation(pop, self.mutation_prob, self.even_mutation_min, self.even_mutation_max)
 
     def crossing(self, pop):
         if self.crossing_type == CrossingType.SINGLE_POINT:
@@ -92,6 +103,10 @@ class GeneticAlgorithm:
             return Crossing.three_point_crossing(pop, self.crossing_prob)
         elif self.crossing_type == CrossingType.HOMOGENEOUS:
             return Crossing.homogeneous_crossing(pop, self.crossing_prob)
+        elif self.crossing_type == CrossingType.ARITHMETIC:
+            return Crossing.arithmetic_crossing(pop, self.crossing_prob)
+        elif self.crossing_type == CrossingType.HEURISTIC:
+            return Crossing.heuristic_crossing(pop, self.crossing_prob)
 
     def inversion(self, pop):
         return Inversion.inversion(pop, self.inversion_prob)
@@ -102,9 +117,16 @@ class GeneticAlgorithm:
                                             self.elite_strategy_num, self.is_max)
 
 
-#lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
-                      # SelectionType.ROULETTE,
-                      # MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT,
-                      # False, float(0.9), float(0.10), float(0.8), float(0.1), int(3), int(80), int(10), int(0))
+# lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
+# SelectionType.ROULETTE,
+# MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT,
+# False, float(0.9), float(0.10), float(0.8), float(0.1), int(3), int(80), int(10), int(0))
 
 
+lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
+                       SelectionType.ROULETTE,
+                       MutationType.EVEN, CrossingType.ARITHMETIC,
+                       True, float(0.9), float(0.10), float(0.8), float(0.1), int(-4), int(4), int(3), int(80), int(10), int(0))
+
+xd = lol.run_algorithm()
+print(xd[0])

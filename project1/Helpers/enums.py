@@ -12,10 +12,14 @@ class CrossingType(Enum):
     DOUBLE_POINT = 2
     TRIPLE_POINT = 3
     HOMOGENEOUS = 4
+    ARITHMETIC = 5
+    HEURISTIC = 6
 
 
 class MutationType(Enum):
     EDGE = 1
     SINGLE_POINT = 2
     DOUBLE_POINT = 3
+    EVEN = 4
+
 

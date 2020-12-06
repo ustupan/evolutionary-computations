@@ -68,3 +68,4 @@ class Selection:
         pop_not_selected = [pop[np.random.randint(0, pop.shape[0])] for x in range (0, pop.shape[0] - int(evaluated_pop.size * percent * 0.01) )]
 
         return best, best_val,  np.array(pop_not_selected)
+

@@ -49,3 +49,14 @@ class Mutation:
                 else:
                     new_pop[i][pop.shape[1] - 1] = 0
         return np.array(new_pop)
+
+    @staticmethod
+    def even_mutation(pop, probability, min_val, max_val):
+        new_pop = np.array(pop, copy=True)
+        for i in range(pop.shape[0]):
+            rnd = np.random.rand()
+            if rnd < probability:
+                index = np.random.choice([0, 1])
+                new_val = np.random.randint(low=min_val, high=max_val)
+                new_pop[i][index] = new_val
+        return new_pop

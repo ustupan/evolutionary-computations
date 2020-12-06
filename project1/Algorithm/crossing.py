@@ -91,3 +91,61 @@ class Crossing:
                 new_pop.append(pop[i])
                 new_pop.append(pop[i + 1])
         return np.array(new_pop)
+
+    @staticmethod
+    def arithmetic_crossing(pop, probability):
+        new_pop = []
+        counter = 0
+        k = np.random.random()
+
+        while counter < pop.shape[0]:
+            rnd = np.random.random()
+            first = pop[np.random.randint(0, pop.shape[0] - 1)]
+            second = pop[np.random.randint(0, pop.shape[0] - 1)]
+            if rnd < probability:
+                x1 = k * first[0] + (1 - k) * second[0]
+                y1 = k * first[1] + (1 - k) * second[1]
+                x2 = (1 - k) * first[0] + k * second[0]
+                y2 = (1 - k) * first[1] + k * second[1]
+                new_pop.append([x1, y1])
+                new_pop.append([x2, y2])
+            else:
+                new_pop.append(first)
+                new_pop.append(second)
+            counter += 2
+        new_pop = np.array(new_pop)
+        if new_pop.shape[0] > pop.shape[0]:
+            new_pop = new_pop[:-1, :]
+
+        return new_pop
+
+    @staticmethod
+    def heuristic_crossing(pop, probability):
+        new_pop = []
+        counter = 0
+        k = np.random.random()
+
+        while counter < pop.shape[0]:
+            rnd = np.random.random()
+            if rnd < probability:
+                first = pop[np.random.randint(0, pop.shape[0] - 1)]
+                second = pop[np.random.randint(0, pop.shape[0] - 1)]
+                while second[0] < first[0] and second[1] < first[1]:
+                    first = pop[np.random.randint(0, pop.shape[0] - 1)]
+                    second = pop[np.random.randint(0, pop.shape[0] - 1)]
+                new_x = k * (second[0] - first[0]) + first[0]
+                new_y = k * (second[1] - first[1]) + first[1]
+                new_pop.append([new_x, new_y])
+                counter += 1
+            else:
+                first = pop[np.random.randint(0, pop.shape[0] - 1)]
+                second = pop[np.random.randint(0, pop.shape[0] - 1)]
+                new_pop.append(first)
+                new_pop.append(second)
+                counter += 2
+
+        new_pop = np.array(new_pop)
+        if new_pop.shape[0] > pop.shape[0]:
+            new_pop = new_pop[:-1, :]
+
+        return new_pop

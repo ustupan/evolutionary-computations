@@ -9,9 +9,9 @@ import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-from project1.Algorithm.beale_function import bale_function
-from project1.Algorithm.genetic_algorithm import GeneticAlgorithm
-from project1.Helpers.enums import SelectionType, MutationType, CrossingType
+from Algorithm.beale_function import bale_function
+from Algorithm.genetic_algorithm import GeneticAlgorithm
+from Helpers.enums import SelectionType, MutationType, CrossingType
 
 LEFT_FRAME_BACKGROUND_COLOR = "#FFFFFF"
 RIGHT_FRAME_BACKGROUND_COLOR = "#E5E5E5"
