@@ -1,20 +1,20 @@
 import numpy as np
-from Algorithm.base import *
-from Algorithm.real_representation_base import Real_Representation_Base
-from Helpers.enums import *
-from Algorithm.selection import *
-from Algorithm.mutation import *
-from Algorithm.crossing import *
-from Algorithm.inversion import *
-from Algorithm.elite_strategy import *
-from Algorithm.beale_function import *
+from project1.Algorithm.base import *
+from project1.Algorithm.real_representation_base import Real_Representation_Base
+from project1.Helpers.enums import *
+from project1.Algorithm.selection import *
+from project1.Algorithm.mutation import *
+from project1.Algorithm.crossing import *
+from project1.Algorithm.inversion import *
+from project1.Algorithm.elite_strategy import *
+from project1.Algorithm.beale_function import *
 
 
 class GeneticAlgorithm:
     def __init__(self, func, num_of_epochs, population_size, num_of_variables, range_min,
                  range_max, precision, selection_type, mutation_type, crossing_type, is_max,
-                 selection_prob, mutation_prob, crossing_prob, inversion_prob,  even_mutation_min=0,
-                 even_mutation_max = 0, tournament_size=0,
+                 selection_prob, mutation_prob, crossing_prob, inversion_prob, even_mutation_min=0,
+                 even_mutation_max=0, tournament_size=0,
                  selection_percent=0, elite_strategy_percent=0, elite_strategy_num=0):
         self.func = func
         self.num_of_epochs = num_of_epochs
@@ -116,17 +116,16 @@ class GeneticAlgorithm:
                                             self.elite_strategy_percent,
                                             self.elite_strategy_num, self.is_max)
 
-
 # lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
 # SelectionType.ROULETTE,
 # MutationType.SINGLE_POINT, CrossingType.SINGLE_POINT,
 # False, float(0.9), float(0.10), float(0.8), float(0.1), int(3), int(80), int(10), int(0))
 
 
-lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
-                       SelectionType.ROULETTE,
-                       MutationType.EVEN, CrossingType.ARITHMETIC,
-                       True, float(0.9), float(0.10), float(0.8), float(0.1), int(-4), int(4), int(3), int(80), int(10), int(0))
-
-xd = lol.run_algorithm()
-print(xd[0])
+# lol = GeneticAlgorithm(bale_function, int(50), int(100), int(2), int(-5), int(5), float(0.0001),
+#                        SelectionType.ROULETTE,
+#                        MutationType.EVEN, CrossingType.ARITHMETIC,
+#                        True, float(0.9), float(0.10), float(0.8), float(0.1), int(-4), int(4), int(3), int(80), int(10), int(0))
+#
+# xd = lol.run_algorithm()
+# print(xd[0])

@@ -18,8 +18,8 @@ RIGHT_FRAME_TITLE_COLOR = "#104FAF"
 RIGHT_FRAME_FONT_COLOR = "#1872FB"
 
 SELECTION_TYPE = ["Selekcja najlepszych", "Koło ruletki", "Selekcja turniejowa"]
-CROSSING_TYPE = ["Jednopunktowe", "Dwupunktowe", "Trzypunktowe", "Jednorodne"]
-MUTATION_TYPE = ["Brzegowa", "Jednopunktowa", "Dwupunktowa"]
+CROSSING_TYPE = ["Arytmetyczne", "Heurystyczne"]
+MUTATION_TYPE = ["Brzegowa", "Jednopunktowa", "Dwupunktowa", "Równomierna"]
 
 
 class MainApplication(tk.Frame):
@@ -37,7 +37,7 @@ class MainApplication(tk.Frame):
         self.create_frames()
 
     def configure_gui(self):
-        self.master.title("OE - Projekt nr 1")
+        self.master.title("OE - Projekt nr 2")
         self.master.geometry("%ix%i" % (self.width, self.height))
         self.master.configure(bg=LEFT_FRAME_BACKGROUND_COLOR)
         self.master.resizable(0, 0)
@@ -132,31 +132,37 @@ class MainApplication(tk.Frame):
         self.mutation_option.set("-- Nie wybrano --")
         self.mutation_option.grid(row=9, column=0, padx=(0, 18), sticky="E")
 
+        self.mutation_min = self.create_spinbox(-100, 100, 1, 11, "normal")
+        self.mutation_min.grid(row=10, column=0, padx=(0, 112), sticky="E")
+
+        self.mutation_max = self.create_spinbox(-100, 100, 1, 11, "normal")
+        self.mutation_max.grid(row=10, column=0, padx=(0, 10), sticky="E")
+
         self.mutation_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
-        self.mutation_precision.grid(row=10, column=0, padx=(0, 10), sticky="E")
+        self.mutation_precision.grid(row=11, column=0, padx=(0, 10), sticky="E")
 
         self.inversion_precision = self.create_spinbox(0, 10, 0.1, 28, "normal")
-        self.inversion_precision.grid(row=11, column=0, padx=(0, 10), sticky="E")
+        self.inversion_precision.grid(row=12, column=0, padx=(0, 10), sticky="E")
 
         self.num_of_function_variables = self.create_spinbox(0, 1000, 1, 28, "normal")
-        self.num_of_function_variables.grid(row=12, column=0, padx=(0, 10), sticky="E")
+        self.num_of_function_variables.grid(row=13, column=0, padx=(0, 10), sticky="E")
 
         self.tournament_size = self.create_spinbox(0, 1000, 1, 28, "normal")
-        self.tournament_size.grid(row=13, column=0, padx=(0, 10), sticky="E")
+        self.tournament_size.grid(row=14, column=0, padx=(0, 10), sticky="E")
 
         self.population_procent = self.create_spinbox(0, 100, 1, 28, "normal")
-        self.population_procent.grid(row=14, column=0, padx=(0, 10), sticky="E")
+        self.population_procent.grid(row=15, column=0, padx=(0, 10), sticky="E")
 
         self.elit_strategy_population_procent = self.create_spinbox(0, 100, 1, 28, "disable")
-        self.elit_strategy_population_procent.grid(row=15, column=0, padx=(0, 10), sticky="E")
+        self.elit_strategy_population_procent.grid(row=16, column=0, padx=(0, 10), sticky="E")
 
         self.elit_strategy_population_size = self.create_spinbox(0, 1000, 1, 28, "disable")
-        self.elit_strategy_population_size.grid(row=16, column=0, padx=(0, 10), sticky="E")
+        self.elit_strategy_population_size.grid(row=17, column=0, padx=(0, 10), sticky="E")
 
         self.button2 = Button(self.right_scrollable_frame, text="Start", bg=RIGHT_FRAME_FONT_COLOR, fg="white",
                               borderless=1,
                               takefocus=0, width=round(self.width * 0.55 - 100), command=self.plot)
-        self.button2.grid(row=20, columnspan=2, pady=15, sticky="S")
+        self.button2.grid(row=21, columnspan=2, pady=15, sticky="S")
 
     def set_lables_right_frame(self):
         self.crate_title_label(0)
@@ -168,13 +174,14 @@ class MainApplication(tk.Frame):
         self.create_label("Krzyżowanie", 7)
         self.create_label("Prawdopodobieństwo krzyżowania", 8)
         self.create_label("Mutacja", 9)
-        self.create_label("Prawdopodobieństwo mutacji", 10)
-        self.create_label("Prawdopodobieństwo inwersji", 11)
-        self.create_label("Liczba zmiennych funkcji", 12)
-        self.create_label("Wielkość turnieju", 13)
-        self.create_label("Procent osobników", 14)
-        self.create_radio_button("Procent osobników (Strategia elitarna)", 1, self.method, 15, 1, "W")
-        self.create_radio_button("Liczba osobników (Strategia elitarna)", 2, self.method, 16, 1, "W")
+        self.create_label("Przedział mutacji", 10)
+        self.create_label("Prawdopodobieństwo mutacji", 11)
+        self.create_label("Prawdopodobieństwo inwersji", 12)
+        self.create_label("Liczba zmiennych funkcji", 13)
+        self.create_label("Wielkość turnieju", 14)
+        self.create_label("Procent osobników", 15)
+        self.create_radio_button("Procent osobników (Strategia elitarna)", 1, self.method, 16, 1, "W")
+        self.create_radio_button("Liczba osobników (Strategia elitarna)", 2, self.method, 17, 1, "W")
 
     def crate_title_label(self, row):
         return tk.Label(self.right_scrollable_frame,
@@ -195,7 +202,7 @@ class MainApplication(tk.Frame):
     def create_time_label(self, text):
         self.time_label = tk.Label(self.right_scrollable_frame, text="Obliczenia wykonały się w : %.5g sekund" % text,
                                    font="system-ui 12 bold",
-                                   bg=RIGHT_FRAME_BACKGROUND_COLOR, fg=RIGHT_FRAME_FONT_COLOR).grid(row=19, column=0,
+                                   bg=RIGHT_FRAME_BACKGROUND_COLOR, fg=RIGHT_FRAME_FONT_COLOR).grid(row=20, column=0,
                                                                                                     padx=20, pady=10,
                                                                                                     sticky="W")
 
@@ -234,6 +241,8 @@ class MainApplication(tk.Frame):
         cross_type = self.crossing_option.get()
         cross_precision = self.crossing_precision.get()
         mut_type = self.mutation_option.get()
+        mut_min = self.mutation_min.get()
+        mut_max = self.mutation_max.get()
         mut_precision = self.mutation_precision.get()
         invers_precision = self.inversion_precision.get()
         fun_variables_num = self.num_of_function_variables.get()
@@ -248,7 +257,7 @@ class MainApplication(tk.Frame):
 
         for i in range(len(CROSSING_TYPE)):
             if cross_type == CROSSING_TYPE[i]:
-                cross_type = CrossingType(i + 1)
+                cross_type = CrossingType(i + 5)
 
         for i in range(len(MUTATION_TYPE)):
             if mut_type == MUTATION_TYPE[i]:
@@ -264,6 +273,8 @@ class MainApplication(tk.Frame):
         # print(cross_type)
         # print(cross_precision)
         # print(mut_type)
+        # print(mut_min)
+        # print(mut_max)
         # print(mut_precision)
         # print(invers_precision)
         # print(fun_variables_num)
@@ -274,8 +285,10 @@ class MainApplication(tk.Frame):
 
         return int(epoch_num), int(pop_size), int(fun_variables_num), int(from_x1), int(
             to_x1), float(chrom_precision), select_type, mut_type, cross_type, is_max, float(1), float(
-            mut_precision), float(cross_precision), float(invers_precision), int(tour_size), int(pop_procent), int(
+            mut_precision), float(cross_precision), float(invers_precision), int(mut_min), int(mut_max), int(
+            tour_size), int(pop_procent), int(
             elit_strategy_pop_procent), int(elit_strategy_pop_size)
+
 
     def normal_or_disabled(self):
         if self.method.get() == 1:
@@ -304,12 +317,12 @@ class MainApplication(tk.Frame):
         b = fig_best.add_subplot(111)
         b.plot(x, best, color="blue")
 
-        b.set_title("Wartości funkcji", fontsize=12)
+        b.set_title("Wartości funkcji", fontsize=10)
         b.set_ylabel("Y", fontsize=10)
         b.set_xlabel("X", fontsize=10)
 
         canvas_best = FigureCanvasTkAgg(fig_best, master=self.left_scrollable_frame)
-        canvas_best.get_tk_widget().grid(column=0, row=0)
+        canvas_best.get_tk_widget().grid(column=0, row=0, padx=(25, 0))
         canvas_best.draw()
         fig_best.savefig('../Plots/wartosc_funkcji.png')
 
@@ -319,12 +332,12 @@ class MainApplication(tk.Frame):
         m = fig_mean.add_subplot(111)
         m.plot(x, mean, color="blue")
 
-        m.set_title("Średnie wartości funkcji", fontsize=12)
+        m.set_title("Średnie wartości funkcji", fontsize=10)
         m.set_ylabel("Y", fontsize=10)
         m.set_xlabel("X", fontsize=10)
 
         canvas_mean = FigureCanvasTkAgg(fig_mean, master=self.left_scrollable_frame)
-        canvas_mean.get_tk_widget().grid(column=0, row=1)
+        canvas_mean.get_tk_widget().grid(column=0, row=1, padx=(25, 0))
         canvas_mean.draw()
         fig_mean.savefig('../Plots/srednie_wartosci_funkcji.png')
 
@@ -334,15 +347,14 @@ class MainApplication(tk.Frame):
         s = fig_std.add_subplot(111)
         s.plot(x, std, color="blue")
 
-        s.set_title("Odchylenie standardowe", fontsize=12)
+        s.set_title("Odchylenie standardowe", fontsize=5)
         s.set_ylabel("Y", fontsize=10)
         s.set_xlabel("X", fontsize=10)
 
         canvas_std = FigureCanvasTkAgg(fig_std, master=self.left_scrollable_frame)
-        canvas_std.get_tk_widget().grid(column=0, row=2)
+        canvas_std.get_tk_widget().grid(column=0, row=2, padx=(25, 0))
         canvas_std.draw()
         fig_std.savefig('../Plots/odchylenie_standardowe.png')
-
 
 
 if __name__ == "__main__":
