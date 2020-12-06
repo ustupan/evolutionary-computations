@@ -3,7 +3,6 @@ from tkinter import ttk
 from tkinter.ttk import Frame
 from tkmacosx import Button
 from datetime import datetime
-import time
 
 import numpy as np
 from matplotlib.figure import Figure
@@ -41,7 +40,7 @@ class MainApplication(tk.Frame):
         self.master.title("OE - Projekt nr 1")
         self.master.geometry("%ix%i" % (self.width, self.height))
         self.master.configure(bg=LEFT_FRAME_BACKGROUND_COLOR)
-        # self.master.resizable(0, 0)
+        self.master.resizable(0, 0)
 
     def create_frames(self):
         self.left_frame = tk.Frame(width=self.width * 0.50, height=self.height - 20,
@@ -290,9 +289,6 @@ class MainApplication(tk.Frame):
         start_time = datetime.now()
         algorithm = GeneticAlgorithm(bale_function, *self.get_seletced_parameters())
         best_solution_in_epochs, solution_mean, solution_std = algorithm.run_algorithm()
-        print(len(best_solution_in_epochs))
-        print(len(solution_mean))
-        print(len(solution_std))
         end_time = datetime.now()
 
         self.create_time_label((end_time - start_time).total_seconds())
@@ -312,9 +308,10 @@ class MainApplication(tk.Frame):
         b.set_ylabel("Y", fontsize=10)
         b.set_xlabel("X", fontsize=10)
 
-        canvas_best = FigureCanvasTkAgg(fig_best, self.left_scrollable_frame)
+        canvas_best = FigureCanvasTkAgg(fig_best, master=self.left_scrollable_frame)
         canvas_best.get_tk_widget().grid(column=0, row=0)
         canvas_best.draw()
+        fig_best.savefig('../Plots/wartosc_funkcji.png')
 
         # ----------------------------------------------------------------------
 
@@ -326,9 +323,10 @@ class MainApplication(tk.Frame):
         m.set_ylabel("Y", fontsize=10)
         m.set_xlabel("X", fontsize=10)
 
-        canvas_mean = FigureCanvasTkAgg(fig_mean, self.left_scrollable_frame)
+        canvas_mean = FigureCanvasTkAgg(fig_mean, master=self.left_scrollable_frame)
         canvas_mean.get_tk_widget().grid(column=0, row=1)
         canvas_mean.draw()
+        fig_mean.savefig('../Plots/srednie_wartosci_funkcji.png')
 
         # ----------------------------------------------------------------------
 
@@ -340,9 +338,11 @@ class MainApplication(tk.Frame):
         s.set_ylabel("Y", fontsize=10)
         s.set_xlabel("X", fontsize=10)
 
-        canvas_std = FigureCanvasTkAgg(fig_std, self.left_scrollable_frame)
+        canvas_std = FigureCanvasTkAgg(fig_std, master=self.left_scrollable_frame)
         canvas_std.get_tk_widget().grid(column=0, row=2)
         canvas_std.draw()
+        fig_std.savefig('../Plots/odchylenie_standardowe.png')
+
 
 
 if __name__ == "__main__":
