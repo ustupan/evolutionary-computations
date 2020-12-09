@@ -347,7 +347,7 @@ class MainApplication(tk.Frame):
         s = fig_std.add_subplot(111)
         s.plot(x, std, color="blue")
 
-        s.set_title("Odchylenie standardowe", fontsize=5)
+        s.set_title("Odchylenie standardowe", fontsize=10)
         s.set_ylabel("Y", fontsize=10)
         s.set_xlabel("X", fontsize=10)
 
