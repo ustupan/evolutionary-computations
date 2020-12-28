@@ -1,4 +1,5 @@
-from random import random
+import random
+from typing import List, Any
 
 from deap import base
 from deap import creator
@@ -10,6 +11,7 @@ def individual(icls, min_val, max_val):
     genome = list()
     genome.append(random.uniform(min_val, max_val))
     genome.append(random.uniform(min_val, max_val))
+
     return icls(genome)
 
 
@@ -54,7 +56,7 @@ def user_input():
         pop_size = input('Wielkość populacji, wybierz: ')
 
     while min_max.isnumeric() is False or (0 >= int(min_max) or int(min_max) > 3):
-        min_max = input('Wybierz:\n1. Minializacja \n2. Maksymalizacja \n')
+        min_max = input('Wybierz:\n1. Minimalizacja \n2. Maksymalizacja \n')
 
     while selection.isnumeric() is False or (0 >= int(selection) or int(selection) > 8):
         selection = input('Selekcja, wybierz:\n1. Turniejowa \n2. Losowa \n3. Najlepszych \n4. Najgorszych \n5. '
@@ -97,22 +99,32 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
     listBest = []
 
     if min_max == 1:
-
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
+        creator.create("Individual", list, fitness=creator.FitnessMin)
     else:
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
-    creator.create("Individual", list, fitness=creator.FitnessMax)
+        creator.create("Individual", list, fitness=creator.FitnessMax)
+
     toolbox = base.Toolbox()
+
     toolbox.register("individual", individual, creator.Individual, min_val=min_val, max_val=max_val)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", fitness)
-    set_selection(toolbox, selection, k)
+
+    set_selection(toolbox, selection, 0.1)
     set_crossing(toolbox, crossing, indpb)
     set_mutation(toolbox, mutation, mu, sigma, indpb)
-    pop = toolbox.population(n=pop_size)
+
+    sizePopulation = 100
+    probabilityMutation = 0.2
+    probabilityCrossover = 0.8
+    numberIteration = 100
+
+    pop = toolbox.population(n=sizePopulation)
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
+
     g = 0
     numberElitism = 1
     while g < num_of_iter:
@@ -155,12 +167,19 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
         mean = sum(fits) / length
         sum2 = sum(x * x for x in fits)
         std = abs(sum2 / length - mean ** 2) ** 0.5
+
         listMin.append(min(fits))
         listMax.append(max(fits))
         listMean.append(mean)
         listStd.append(std)
         best_ind = tools.selBest(pop, 1)[0]
         listBest.append(best_ind.fitness.values)
+
+    print('min ' + listMin)
+    print('max ' + listMax)
+    print('mean ' + listMean)
+    print('std ' + listStd)
+    print('best ' + listBest)
 
     return listMin, listMax, listMean, listStd, listBest
 
@@ -175,7 +194,7 @@ def set_selection(toolbox, selection, k):
     elif selection == 4:
         toolbox.register("select", tools.selWorst)
     elif selection == 5:
-        toolbox.register("select", tools.selRandom)
+        toolbox.register("select", tools.selRoulette)
     elif selection == 6:
         toolbox.register("select", tools.selLexicase)
     elif selection == 7:
@@ -240,7 +259,7 @@ def savePlots(graphList, graphType):
 
 if __name__ == '__main__':
     min_max, selection, tournament_size, crossing, indpb, mutation, pop_size, prob_mut, prob_cross, num_of_iter, sigma, mu = user_input()
-    listMin, listMax, listMean, listStd, listBest = genetics(min_max, -4, 4, selection, tournament_size, crossing,
+    listMin, listMax, listMean, listStd, listBest = genetics(min_max, -5, 5, selection, tournament_size, crossing,
                                                              indpb, mutation, pop_size, prob_mut, prob_cross,
                                                              num_of_iter, mu, sigma)
 
