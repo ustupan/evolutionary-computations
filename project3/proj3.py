@@ -17,6 +17,7 @@ def fitness(individual):
             2.25 - individual[0] + individual[0] * individual[1] ** 2) ** 2 + (
                    2.625 - individual[0] + individual[0] * individual[1] ** 3) ** 2
 
+
 def user_input():
     min_max = '0'
     selection = '0'
@@ -46,8 +47,8 @@ def user_input():
                           'uniwersalna')
 
     if selection == 1:
-        while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size)/2):
-            num_of_iter = input('Wielkość turnieju, wybierz:\n')
+        while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size) / 2):
+            tournament_size = input('Wielkość turnieju, wybierz:\n')
 
     while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 6):
         crossing = input(
@@ -58,9 +59,7 @@ def user_input():
         algorithm = input(
             'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n4. Polynomial bounded \n')
 
-
-
-    return min_max, selection, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter
+    return min_max, selection, tournament_size, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter
 
 
 def genetics(min_max, min_val, max_val, selection, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter):
@@ -74,7 +73,8 @@ def genetics(min_max, min_val, max_val, selection, crossing, algorithm, pop_size
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", fitness)
 
-def set_selection(toolbox, selection, k = 0):
+
+def set_selection(toolbox, selection, k=0):
     if selection == 1:
         pass
     elif selection == 2:
@@ -96,7 +96,36 @@ def set_selection(toolbox, selection, k = 0):
 
     return toolbox
 
+
+def set_crossing(toolbox, crossing):
+    if crossing == 1:
+        pass
+    elif crossing == 2:
+        pass
+    elif crossing == 3:
+        pass
+    elif crossing == 4:
+        pass
+    elif crossing == 5:
+        pass
+    elif crossing == 6:
+        pass
+
+    return toolbox
+
+
+def set_mutation(toolbox, mutation):
+    if mutation == 1:
+        pass
+    elif mutation == 2:
+        pass
+    elif mutation == 3:
+        pass
+    elif mutation == 4:
+        pass
+
+    return toolbox
+
+
 if __name__ == '__main__':
-    min_max, selection, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter = user_input()
-
-
+    min_max, selection, tournament_size, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter = user_input()
