@@ -18,21 +18,31 @@ def fitness(individual):
                    2.625 - individual[0] + individual[0] * individual[1] ** 3) ** 2
 
 
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
 def user_input():
     min_max = '0'
     selection = '0'
     tournament_size = '0'
     crossing = '0'
+    indpb = '0'
+    eta = '0'
     mutation = '0'
     pop_size = '0'
     prob_mut = '0'
     prob_cross = '0'
     num_of_iter = '0'
 
-    while prob_mut.isnumeric() is False or (0 >= float(prob_mut) or float(prob_mut) > 1):
+    while is_float(prob_mut) is False or (0 >= float(prob_mut) or float(prob_mut) > 1):
         prob_mut = input('Prawdopodobieństwo mutacji, wybierz:\n')
 
-    while prob_cross.isnumeric() is False or (0 >= float(prob_cross) or float(prob_cross) > 1):
+    while is_float(prob_cross) is False or (0 >= float(prob_cross) or float(prob_cross) > 1):
         prob_cross = input('Prawdopodobieństwo krzyżowania, wybierz:\n')
 
     while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > 1000):
@@ -46,23 +56,32 @@ def user_input():
                           'Ruletki\n6. Leksykazy\n7. Automatycznej Leksykazy epsilon\n8. Stochastyczne '
                           'uniwersalne próbkowanie')
 
-    if selection == 1:
+    if int(selection) == 1:
         while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size) / 2):
             tournament_size = input('Wielkość turnieju, wybierz:\n')
 
     while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 6):
         crossing = input(
             'Krzyżowanie, wybierz:\n1. Dwupunktowe \n2. Jednopunktowe \n3. Jednorodne \n4. Częściowo dopasowane \n5. '
-            'Uporządkowane\n6. Mieszane\n')
+            'Uporządkowane\n6. Symulowanie binarne\n')
+
+    if int(crossing) == 3:
+        while is_float(indpb) is False or (0 >= float(indpb) or float(indpb) > 1):
+            indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz:\n')
+
+    if int(crossing) == 6:
+        while eta.isnumeric() is False or (0 >= int(eta) or int(eta) > 1000):
+            eta = input('Stopień gromadzenia krzyżowania eta, wybierz:\n')
 
     while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 4):
         mutation = input(
             'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n4. Polynomial bounded \n')
 
-    return min_max, selection, tournament_size, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter
+    return min_max, selection, tournament_size, crossing, indpb, eta, mutation, pop_size, prob_mut, prob_cross, num_of_iter
 
 
-def genetics(min_max, min_val, max_val, selection, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter):
+def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, eta, algorithm, pop_size, prob_mut, prob_cross,
+             num_of_iter):
     if min_max == 1:
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
     else:
@@ -95,17 +114,18 @@ def set_selection(toolbox, selection, k):
     return toolbox
 
 
-def set_crossing(toolbox, crossing):
+def set_crossing(toolbox, crossing, indpb):
     if crossing == 1:
-        pass
+        toolbox.register("mate", tools.cxTwoPoint)
     elif crossing == 2:
-        pass
+        toolbox.register("mate", tools.cxOnePoint)
     elif crossing == 3:
-        pass
+        indpb = float(indpb)
+        toolbox.register("mate", tools.cxUniform, indpb=indpb)
     elif crossing == 4:
-        pass
+        toolbox.register("mate", tools.cxPartialyMatched)
     elif crossing == 5:
-        pass
+        toolbox.register("mate", tools.cxOrdered)
     elif crossing == 6:
         pass
 
@@ -126,4 +146,4 @@ def set_mutation(toolbox, mutation):
 
 
 if __name__ == '__main__':
-    min_max, selection, tournament_size, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter = user_input()
+    min_max, selection, tournament_size, crossing, indpb, eta, mutation, pop_size, prob_mut, prob_cross, num_of_iter = user_input()
