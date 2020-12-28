@@ -3,6 +3,7 @@ from random import random
 from deap import base
 from deap import creator
 from deap import tools
+import matplotlib.pyplot as plt
 
 
 def individual(icls, min_val, max_val):
@@ -34,7 +35,6 @@ def user_input():
     indpb = '0'
     mu = '0'
     sigma = '0'
-    eta = '0'
     mutation = '0'
     pop_size = '0'
     prob_mut = '0'
@@ -50,6 +50,9 @@ def user_input():
     while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > 1000):
         num_of_iter = input('Liczba iteracji, wybierz: ')
 
+    while pop_size.isnumeric() is False or (0 >= int(pop_size) or int(pop_size) > 1000):
+        pop_size = input('Wielkość populacji, wybierz: ')
+
     while min_max.isnumeric() is False or (0 >= int(min_max) or int(min_max) > 3):
         min_max = input('Wybierz:\n1. Minializacja \n2. Maksymalizacja \n')
 
@@ -59,21 +62,17 @@ def user_input():
                           'uniwersalne próbkowanie\n')
 
     if int(selection) == 1:
-        while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size) / 2):
+        while tournament_size.isnumeric() is False or (
+                0 >= int(tournament_size) or int(tournament_size) > int(pop_size) / 2):
             tournament_size = input('Wielkość turnieju, wybierz: ')
 
-    while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 6):
+    while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 5):
         crossing = input(
             'Krzyżowanie, wybierz:\n1. Dwupunktowe \n2. Jednopunktowe \n3. Jednorodne \n4. Częściowo dopasowane \n5. '
             'Uporządkowane\n6. Symulowanie binarne\n')
 
-    if int(crossing) == 3:
-        while is_float(indpb) is False or (0 >= float(indpb) or float(indpb) > 1):
-            indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz: ')
-
-    if int(crossing) == 6:
-        while eta.isnumeric() is False or (0 >= int(eta) or int(eta) > 1000):
-            eta = input('Stopień gromadzenia krzyżowania eta, wybierz: ')
+    while is_float(indpb) is False or (0 >= float(indpb) or float(indpb) > 1):
+        indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz: ')
 
     while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 4):
         mutation = input(
@@ -85,12 +84,20 @@ def user_input():
         while is_float(sigma) is False or (0 >= float(sigma) or float(sigma) > 100):
             sigma = input('Standardowe odchylenie, wybierz: ')
 
-    return min_max, selection, tournament_size, crossing, indpb, eta, mutation, pop_size, prob_mut, prob_cross, num_of_iter
+    return int(min_max), int(selection), int(tournament_size), int(crossing), float(indpb), int(mutation), int(
+        pop_size), float(prob_mut), float(prob_cross), int(num_of_iter), float(sigma), float(mu)
 
 
-def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, eta, algorithm, pop_size, prob_mut, prob_cross,
-             num_of_iter):
+def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation, pop_size, prob_mut, prob_cross,
+             num_of_iter, mu, sigma):
+    listMin = []
+    listMax = []
+    listMean = []
+    listStd = []
+    listBest = []
+
     if min_max == 1:
+
         creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
     else:
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -99,6 +106,63 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, eta, algo
     toolbox.register("individual", individual, creator.Individual, min_val=min_val, max_val=max_val)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", fitness)
+    set_selection(toolbox, selection, k)
+    set_crossing(toolbox, crossing, indpb)
+    set_mutation(toolbox, mutation, mu, sigma, indpb)
+    pop = toolbox.population(n=pop_size)
+    fitnesses = list(map(toolbox.evaluate, pop))
+    for ind, fit in zip(pop, fitnesses):
+        ind.fitness.values = fit
+    g = 0
+    numberElitism = 1
+    while g < num_of_iter:
+        g = g + 1
+
+        # Select the next generation individuals
+        offspring = toolbox.select(pop, len(pop))
+        # Clone the selected individuals
+        offspring = list(map(toolbox.clone, offspring))
+
+        listElitism = []
+        for x in range(0, numberElitism):
+            listElitism.append(tools.selBest(pop, 1)[0])
+        # Apply crossover and mutation on the offspring
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            # cross two individuals with probability CXPB
+            if random.random() < prob_cross:
+                toolbox.mate(child1, child2)
+                # fitness values of the children
+                # must be recalculated later
+                del child1.fitness.values
+                del child2.fitness.values
+
+        for mutant in offspring:
+            # mutate an individual with probability MUTPB
+            if random.random() < prob_mut:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
+
+        # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
+        print(" Evaluated %i individuals" % len(invalid_ind))
+        pop[:] = offspring + listElitism
+        # Gather all the fitnesses in one list and print the stats
+        fits = [ind.fitness.values[0] for ind in pop]
+        length = len(pop)
+        mean = sum(fits) / length
+        sum2 = sum(x * x for x in fits)
+        std = abs(sum2 / length - mean ** 2) ** 0.5
+        listMin.append(min(fits))
+        listMax.append(max(fits))
+        listMean.append(mean)
+        listStd.append(std)
+        best_ind = tools.selBest(pop, 1)[0]
+        listBest.append(best_ind.fitness.values)
+
+    return listMin, listMax, listMean, listStd, listBest
 
 
 def set_selection(toolbox, selection, k):
@@ -134,8 +198,6 @@ def set_crossing(toolbox, crossing, indpb):
         toolbox.register("mate", tools.cxPartialyMatched)
     elif crossing == 5:
         toolbox.register("mate", tools.cxOrdered)
-    elif crossing == 6:
-        pass
 
     return toolbox
 
@@ -153,5 +215,37 @@ def set_mutation(toolbox, mutation, mu, sigma, indpb):
     return toolbox
 
 
+def savePlots(graphList, graphType):
+    if graphType == 1:
+        plt.plot(graphList, label="sredni osobnik")
+        name = "srednia-osobnik"
+    elif graphType == 2:
+        plt.plot(graphList, label="Srednie odchylenie")
+        name = "srednie-odchylenie-osobnik"
+    elif graphType == 3:
+        plt.plot(graphList, label="Max funkcji celu")
+        name = "max-funkcji-celu"
+    elif graphType == 4:
+        plt.plot(graphList, label="Min funkcji celu")
+        name = "min-funkcji-celu"
+    else:
+        plt.plot(graphList, label="najlepszy osobnik w danej populacji")
+        name = "najlepszy-populacja-osobnik"
+
+    leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=True, fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    plt.savefig('saved/' + name + '.png', bbox_inches='tight')
+    plt.close()
+
+
 if __name__ == '__main__':
-    min_max, selection, tournament_size, crossing, indpb, eta, mutation, pop_size, prob_mut, prob_cross, num_of_iter = user_input()
+    min_max, selection, tournament_size, crossing, indpb, mutation, pop_size, prob_mut, prob_cross, num_of_iter, sigma, mu = user_input()
+    listMin, listMax, listMean, listStd, listBest = genetics(min_max, -4, 4, selection, tournament_size, crossing,
+                                                             indpb, mutation, pop_size, prob_mut, prob_cross,
+                                                             num_of_iter, mu, sigma)
+
+    savePlots(listMean, 1)
+    savePlots(listStd, 2)
+    savePlots(listMax, 3)
+    savePlots(listMin, 4)
+    savePlots(listBest, 5)
