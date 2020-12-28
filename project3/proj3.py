@@ -23,7 +23,7 @@ def user_input():
     selection = '0'
     tournament_size = '0'
     crossing = '0'
-    algorithm = '0'
+    mutation = '0'
     pop_size = '0'
     prob_mut = '0'
     prob_cross = '0'
@@ -41,10 +41,10 @@ def user_input():
     while min_max.isnumeric() is False or (0 >= int(min_max) or int(min_max) > 3):
         min_max = input('Wybierz:\n1. Minializacja \n2. Maksymalizacja \n')
 
-    while selection.isnumeric() is False or (0 >= int(selection) or int(selection) > 9):
+    while selection.isnumeric() is False or (0 >= int(selection) or int(selection) > 8):
         selection = input('Selekcja, wybierz:\n1. Turniejowa \n2. Losowa \n3. Najlepszych \n4. Najgorszych \n5. '
-                          'Ruletki\n6. Leksykazy\n7. Podwójna Turniejowa\n8. Leksykazy epsilon\n9. Stochastyczna '
-                          'uniwersalna')
+                          'Ruletki\n6. Leksykazy\n7. Automatycznej Leksykazy epsilon\n8. Stochastyczne '
+                          'uniwersalne próbkowanie')
 
     if selection == 1:
         while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size) / 2):
@@ -55,8 +55,8 @@ def user_input():
             'Krzyżowanie, wybierz:\n1. Dwupunktowe \n2. Jednopunktowe \n3. Jednorodne \n4. Częściowo dopasowane \n5. '
             'Uporządkowane\n6. Mieszane\n')
 
-    while algorithm.isnumeric() is False or (0 >= int(algorithm) or int(algorithm) > 4):
-        algorithm = input(
+    while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 4):
+        mutation = input(
             'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n4. Polynomial bounded \n')
 
     return min_max, selection, tournament_size, crossing, algorithm, pop_size, prob_mut, prob_cross, num_of_iter
@@ -74,25 +74,23 @@ def genetics(min_max, min_val, max_val, selection, crossing, algorithm, pop_size
     toolbox.register("evaluate", fitness)
 
 
-def set_selection(toolbox, selection, k=0):
+def set_selection(toolbox, selection, k):
     if selection == 1:
-        pass
+        toolbox.register("select", tools.selTournament, tournsize=k)
     elif selection == 2:
-        pass
+        toolbox.register("select", tools.selRandom)
     elif selection == 3:
-        pass
+        toolbox.register("select", tools.selBest)
     elif selection == 4:
-        pass
+        toolbox.register("select", tools.selWorst)
     elif selection == 5:
-        pass
+        toolbox.register("select", tools.selRandom)
     elif selection == 6:
-        pass
+        toolbox.register("select", tools.selLexicase)
     elif selection == 7:
-        pass
+        toolbox.register("select", tools.selAutomaticEpsilonLexicase)
     elif selection == 8:
-        pass
-    elif selection == 9:
-        pass
+        toolbox.register("select", tools.selStochasticUniversalSampling)
 
     return toolbox
 
