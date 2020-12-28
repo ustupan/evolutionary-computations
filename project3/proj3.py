@@ -32,6 +32,8 @@ def user_input():
     tournament_size = '0'
     crossing = '0'
     indpb = '0'
+    mu = '0'
+    sigma = '0'
     eta = '0'
     mutation = '0'
     pop_size = '0'
@@ -40,13 +42,13 @@ def user_input():
     num_of_iter = '0'
 
     while is_float(prob_mut) is False or (0 >= float(prob_mut) or float(prob_mut) > 1):
-        prob_mut = input('Prawdopodobieństwo mutacji, wybierz:\n')
+        prob_mut = input('Prawdopodobieństwo mutacji, wybierz: ')
 
     while is_float(prob_cross) is False or (0 >= float(prob_cross) or float(prob_cross) > 1):
-        prob_cross = input('Prawdopodobieństwo krzyżowania, wybierz:\n')
+        prob_cross = input('Prawdopodobieństwo krzyżowania, wybierz: ')
 
     while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > 1000):
-        num_of_iter = input('Liczba iteracji, wybierz:\n')
+        num_of_iter = input('Liczba iteracji, wybierz: ')
 
     while min_max.isnumeric() is False or (0 >= int(min_max) or int(min_max) > 3):
         min_max = input('Wybierz:\n1. Minializacja \n2. Maksymalizacja \n')
@@ -54,11 +56,11 @@ def user_input():
     while selection.isnumeric() is False or (0 >= int(selection) or int(selection) > 8):
         selection = input('Selekcja, wybierz:\n1. Turniejowa \n2. Losowa \n3. Najlepszych \n4. Najgorszych \n5. '
                           'Ruletki\n6. Leksykazy\n7. Automatycznej Leksykazy epsilon\n8. Stochastyczne '
-                          'uniwersalne próbkowanie')
+                          'uniwersalne próbkowanie\n')
 
     if int(selection) == 1:
         while num_of_iter.isnumeric() is False or (0 >= int(num_of_iter) or int(num_of_iter) > int(pop_size) / 2):
-            tournament_size = input('Wielkość turnieju, wybierz:\n')
+            tournament_size = input('Wielkość turnieju, wybierz: ')
 
     while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 6):
         crossing = input(
@@ -67,15 +69,21 @@ def user_input():
 
     if int(crossing) == 3:
         while is_float(indpb) is False or (0 >= float(indpb) or float(indpb) > 1):
-            indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz:\n')
+            indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz: ')
 
     if int(crossing) == 6:
         while eta.isnumeric() is False or (0 >= int(eta) or int(eta) > 1000):
-            eta = input('Stopień gromadzenia krzyżowania eta, wybierz:\n')
+            eta = input('Stopień gromadzenia krzyżowania eta, wybierz: ')
 
     while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 4):
         mutation = input(
             'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n4. Polynomial bounded \n')
+
+    if int(mutation) == 1:
+        while is_float(mu) is False or (0 >= float(mu) or float(mu) > 100):
+            mu = input('Średnia, wybierz: ')
+        while is_float(sigma) is False or (0 >= float(sigma) or float(sigma) > 100):
+            sigma = input('Standardowe odchylenie, wybierz: ')
 
     return min_max, selection, tournament_size, crossing, indpb, eta, mutation, pop_size, prob_mut, prob_cross, num_of_iter
 
@@ -132,15 +140,15 @@ def set_crossing(toolbox, crossing, indpb):
     return toolbox
 
 
-def set_mutation(toolbox, mutation):
+def set_mutation(toolbox, mutation, mu, sigma, indpb):
     if mutation == 1:
-        pass
+        toolbox.register("mutate", tools.mutGaussian, mu=float(mu), sigma=float(sigma), indpb=float(indpb))
     elif mutation == 2:
-        pass
+        toolbox.register("mutate", tools.mutShuffleIndexes, indpb=float(indpb))
     elif mutation == 3:
-        pass
+        toolbox.register("mutate", tools.mutFlipBit, indpb=float(indpb))
     elif mutation == 4:
-        pass
+        toolbox.register("mutate", tools.mutPolynomialBounded, indpb=float(indpb))
 
     return toolbox
 
