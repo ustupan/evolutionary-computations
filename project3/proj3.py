@@ -1,3 +1,4 @@
+
 import random
 from typing import List, Any
 
@@ -9,16 +10,17 @@ import matplotlib.pyplot as plt
 
 def individual(icls, min_val, max_val):
     genome = list()
-    genome.append(random.uniform(min_val, max_val))
-    genome.append(random.uniform(min_val, max_val))
-
+   # genome.append(random.uniform(min_val, max_val))
+   # genome.append(random.uniform(min_val, max_val))
+    genome = [random.uniform(min_val, max_val), random.uniform(min_val, max_val)]
     return icls(genome)
 
 
 def fitness(individual):
-    return (1.5 - individual[0] + individual[0] * individual[1]) ** 2 + (
+    result = (1.5 - individual[0] + individual[0] * individual[1]) ** 2 + (
             2.25 - individual[0] + individual[0] * individual[1] ** 2) ** 2 + (
                    2.625 - individual[0] + individual[0] * individual[1] ** 3) ** 2
+    return result,
 
 
 def is_float(s):
@@ -111,9 +113,9 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", fitness)
 
-    set_selection(toolbox, selection, 0.1)
-    set_crossing(toolbox, crossing, indpb)
-    set_mutation(toolbox, mutation, mu, sigma, indpb)
+    toolbox = set_selection(toolbox, selection, 0.1)
+    toolbox = set_crossing(toolbox, crossing, indpb)
+    toolbox = set_mutation(toolbox, mutation, mu, sigma, indpb)
 
     sizePopulation = 100
     probabilityMutation = 0.2
@@ -174,12 +176,6 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
         listStd.append(std)
         best_ind = tools.selBest(pop, 1)[0]
         listBest.append(best_ind.fitness.values)
-
-    print('min ' + listMin)
-    print('max ' + listMax)
-    print('mean ' + listMean)
-    print('std ' + listStd)
-    print('best ' + listBest)
 
     return listMin, listMax, listMean, listStd, listBest
 
