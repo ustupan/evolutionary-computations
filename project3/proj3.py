@@ -113,16 +113,11 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
     toolbox.register("evaluate", fitness)
 
-    toolbox = set_selection(toolbox, selection, 0.1)
+    toolbox = set_selection(toolbox, selection, k)
     toolbox = set_crossing(toolbox, crossing, indpb)
     toolbox = set_mutation(toolbox, mutation, mu, sigma, indpb)
 
-    sizePopulation = 100
-    probabilityMutation = 0.2
-    probabilityCrossover = 0.8
-    numberIteration = 100
-
-    pop = toolbox.population(n=sizePopulation)
+    pop = toolbox.population(n=pop_size)
     fitnesses = list(map(toolbox.evaluate, pop))
     for ind, fit in zip(pop, fitnesses):
         ind.fitness.values = fit
@@ -182,7 +177,7 @@ def genetics(min_max, min_val, max_val, selection, k, crossing, indpb, mutation,
 
 def set_selection(toolbox, selection, k):
     if selection == 1:
-        toolbox.register("select", tools.selTournament, tournsize=k)
+        toolbox.register("select", tools.selTournament, tournsize=int(k))
     elif selection == 2:
         toolbox.register("select", tools.selRandom)
     elif selection == 3:
