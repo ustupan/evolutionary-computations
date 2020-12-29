@@ -70,17 +70,16 @@ def user_input():
                 0 >= int(tournament_size) or int(tournament_size) > int(pop_size) / 2):
             tournament_size = input('Wielkość turnieju, wybierz: ')
 
-    while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 5):
+    while crossing.isnumeric() is False or (0 >= int(crossing) or int(crossing) > 3):
         crossing = input(
-            'Krzyżowanie, wybierz:\n1. Dwupunktowe \n2. Jednopunktowe \n3. Jednorodne \n4. Częściowo dopasowane \n5. '
-            'Uporządkowane\n6. Symulowanie binarne\n')
+            'Krzyżowanie, wybierz:\n1. Dwupunktowe \n2. Jednopunktowe \n3. Jednorodne \n')
 
     while is_float(indpb) is False or (0 >= float(indpb) or float(indpb) > 1):
         indpb = input('Niezależne prawdopodobieństwo wymiany każdego atrybutu, wybierz: ')
 
-    while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 4):
+    while mutation.isnumeric() is False or (0 >= int(mutation) or int(mutation) > 3):
         mutation = input(
-            'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n4. Polynomial bounded \n')
+            'Mutacja, wybierz:\n1. Mutacja Gaussa \n2. Tasowanie indeksów\n3. Flip bit \n')
 
     if int(mutation) == 1:
         while is_float(mu) is False or (0 >= float(mu) or float(mu) > 100):
@@ -204,11 +203,6 @@ def set_crossing(toolbox, crossing, indpb):
     elif crossing == 3:
         indpb = float(indpb)
         toolbox.register("mate", tools.cxUniform, indpb=indpb)
-    elif crossing == 4:
-        toolbox.register("mate", tools.cxPartialyMatched)
-    elif crossing == 5:
-        toolbox.register("mate", tools.cxOrdered)
-
     return toolbox
 
 
