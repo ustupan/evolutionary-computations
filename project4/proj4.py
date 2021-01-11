@@ -1,35 +1,29 @@
 import random
-import pandas as pd
 
+import matplotlib.pyplot as plt
+import pandas as pd
 from deap import base
 from deap import creator
 from deap import tools
 
-import matplotlib.pyplot as plt
-
-from project4.SVC_classifier import SVCParametersFeatures
 from project4.SVC_classifier import SVCParametersFeatureFitness
+from project4.SVC_classifier import SVCParametersFeatures
 from project4.SVC_classifier import mutationSVC
-
-from project4.decision_tree_classifier import DecisionTreeParametersFeatures
 from project4.decision_tree_classifier import DecisionTreeClassifierFitness
+from project4.decision_tree_classifier import DecisionTreeParametersFeatures
 from project4.decision_tree_classifier import mutationDecisionTree
-
-from project4.k_neighbors_classifier import KNeighborsParametersFeatures
-from project4.k_neighbors_classifier import KNeighborsParametersFeatureFitness
-from project4.k_neighbors_classifier import mutationKNeighbors
-
-from project4.random_forest_classifier import RandomForestParametersFeatures
-from project4.random_forest_classifier import RandomForestParametersFeatureFitness
-from project4.random_forest_classifier import mutationRandomForest
-
-from project4.linear_svc_classifier import LinearSVCParametersFeatures
-from project4.linear_svc_classifier import LinearSVCParametersFeatureFitness
-from project4.linear_svc_classifier import mutationLinearSVC
-
-from project4.dummy_classifier import DummyParametersFeatures
 from project4.dummy_classifier import DummyClassifierFitness
+from project4.dummy_classifier import DummyParametersFeatures
 from project4.dummy_classifier import mutationDummy
+from project4.k_neighbors_classifier import KNeighborsParametersFeatureFitness
+from project4.k_neighbors_classifier import KNeighborsParametersFeatures
+from project4.k_neighbors_classifier import mutationKNeighbors
+from project4.linear_svc_classifier import LinearSVCParametersFeatureFitness
+from project4.linear_svc_classifier import LinearSVCParametersFeatures
+from project4.linear_svc_classifier import mutationLinearSVC
+from project4.random_forest_classifier import RandomForestParametersFeatureFitness
+from project4.random_forest_classifier import RandomForestParametersFeatures
+from project4.random_forest_classifier import mutationRandomForest
 
 
 def is_float(s):
@@ -53,9 +47,9 @@ def user_input():
     classifier = '0'
 
     while classifier.isnumeric() is False or (0 >= int(classifier) or int(classifier) > 6):
-        classifier = input('Klasyfikator, wybierz:\n1. SVCParametersFeatures \n2. KNeighborsParametersFeatures \n'
-                           '3. RandomForestParametersFeatures \n4. RadiusNeighborsParametersFeatures \n'
-                           '5. NuSVCParametersFeatures\n6. LinearSVCParametersFeatures\n')
+        classifier = input('Klasyfikator, wybierz:\n1. DecisionTree \n2. Dummy \n'
+                           '3. KNeighbors \n4. LinearSVC \n'
+                           '5. RandomForest\n6. SVC\n')
 
     while is_float(prob_mut) is False or (0 >= float(prob_mut) or float(prob_mut) > 1):
         prob_mut = input('Prawdopodobieństwo mutacji, wybierz: ')
