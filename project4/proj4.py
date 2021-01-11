@@ -186,12 +186,22 @@ def genetics(selection, k, crossing, indpb, pop_size, prob_mut, prob_cross,
         sum2 = sum(x * x for x in fits)
         std = abs(sum2 / length - mean ** 2) ** 0.5
 
-        listMin.append(min(fits))
-        listMax.append(max(fits))
-        listMean.append(mean)
-        listStd.append(std)
+        # listMin.append(min(fits))
+        # listMax.append(max(fits))
+        # listMean.append(mean)
+        # listStd.append(std)
+        # best_ind = tools.selBest(pop, 1)[0]
+        # listBest.append(best_ind.fitness.values)
+
+        print("Generation " + str(g))
+        print(" Min %s" % min(fits))
+        print(" Max %s" % max(fits))
+        print(" Avg %s" % mean)
+        print(" Std %s" % std)
         best_ind = tools.selBest(pop, 1)[0]
-        listBest.append(best_ind.fitness.values)
+        print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
+
+    print("-- End of (successful) evolution --")
 
     return listMin, listMax, listMean, listStd, listBest
 
@@ -277,8 +287,8 @@ if __name__ == '__main__':
 
     '''
 
-    savePlots(listMean, 1)
-    savePlots(listStd, 2)
-    savePlots(listMax, 3)
-    savePlots(listMin, 4)
-    savePlots(listBest, 5)
+    # savePlots(listMean, 1)
+    # savePlots(listStd, 2)
+    # savePlots(listMax, 3)
+    # savePlots(listMin, 4)
+    # savePlots(listBest, 5)
