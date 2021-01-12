@@ -6,24 +6,24 @@ from deap import base
 from deap import creator
 from deap import tools
 
-from project4.SVC_classifier import SVCParametersFeatureFitness
-from project4.SVC_classifier import SVCParametersFeatures
-from project4.SVC_classifier import mutationSVC
-from project4.decision_tree_classifier import DecisionTreeClassifierFitness
-from project4.decision_tree_classifier import DecisionTreeParametersFeatures
-from project4.decision_tree_classifier import mutationDecisionTree
-from project4.dummy_classifier import DummyClassifierFitness
-from project4.dummy_classifier import DummyParametersFeatures
-from project4.dummy_classifier import mutationDummy
-from project4.k_neighbors_classifier import KNeighborsParametersFeatureFitness
-from project4.k_neighbors_classifier import KNeighborsParametersFeatures
-from project4.k_neighbors_classifier import mutationKNeighbors
-from project4.linear_svc_classifier import LinearSVCParametersFeatureFitness
-from project4.linear_svc_classifier import LinearSVCParametersFeatures
-from project4.linear_svc_classifier import mutationLinearSVC
-from project4.random_forest_classifier import RandomForestParametersFeatureFitness
-from project4.random_forest_classifier import RandomForestParametersFeatures
-from project4.random_forest_classifier import mutationRandomForest
+from SVC_classifier import SVCParametersFeatureFitness
+from SVC_classifier import SVCParametersFeatures
+from SVC_classifier import mutationSVC
+from decision_tree_classifier import DecisionTreeClassifierFitness
+from decision_tree_classifier import DecisionTreeParametersFeatures
+from decision_tree_classifier import mutationDecisionTree
+from radius_neighbors_classifier import RadiusNeighborsParametersFeatures
+from radius_neighbors_classifier import RadiusNeighborsParametersFeatureFitness
+from radius_neighbors_classifier import mutationRNeighbors
+from k_neighbors_classifier import KNeighborsParametersFeatureFitness
+from k_neighbors_classifier import KNeighborsParametersFeatures
+from k_neighbors_classifier import mutationKNeighbors
+from linear_svc_classifier import LinearSVCParametersFeatureFitness
+from linear_svc_classifier import LinearSVCParametersFeatures
+from linear_svc_classifier import mutationLinearSVC
+from random_forest_classifier import RandomForestParametersFeatureFitness
+from random_forest_classifier import RandomForestParametersFeatures
+from random_forest_classifier import mutationRandomForest
 
 
 def is_float(s):
@@ -47,7 +47,7 @@ def user_input():
     classifier = '0'
 
     while classifier.isnumeric() is False or (0 >= int(classifier) or int(classifier) > 6):
-        classifier = input('Klasyfikator, wybierz:\n1. DecisionTree \n2. Dummy \n'
+        classifier = input('Klasyfikator, wybierz:\n1. DecisionTree \n2. Radius Neighbors \n'
                            '3. KNeighbors \n4. LinearSVC \n'
                            '5. RandomForest\n6. SVC\n')
 
@@ -94,9 +94,9 @@ def set_toolbox(toolbox, classifier, number_of_atributtes, df, y):
         toolbox.register("mutate", mutationDecisionTree)
 
     elif classifier == 2:
-        toolbox.register("individual", DummyParametersFeatures, number_of_atributtes, creator.Individual)
-        toolbox.register("evaluate", DummyClassifierFitness, y, df, number_of_atributtes)
-        toolbox.register("mutate", mutationDummy)
+        toolbox.register("individual", RadiusNeighborsParametersFeatures, number_of_atributtes, creator.Individual)
+        toolbox.register("evaluate", RadiusNeighborsParametersFeatureFitness, y, df, number_of_atributtes)
+        toolbox.register("mutate", mutationRNeighbors)
 
     elif classifier == 3:
         toolbox.register("individual", KNeighborsParametersFeatures, number_of_atributtes, creator.Individual)
@@ -123,12 +123,6 @@ def set_toolbox(toolbox, classifier, number_of_atributtes, df, y):
 
 def genetics(selection, k, crossing, indpb, pop_size, prob_mut, prob_cross,
              num_of_iter, classifier, number_of_atributtes, df, y):
-    listMin = []
-    listMax = []
-    listMean = []
-    listStd = []
-    listBest = []
-
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
     creator.create("Individual", list, fitness=creator.FitnessMax)
 
@@ -186,13 +180,6 @@ def genetics(selection, k, crossing, indpb, pop_size, prob_mut, prob_cross,
         sum2 = sum(x * x for x in fits)
         std = abs(sum2 / length - mean ** 2) ** 0.5
 
-        # listMin.append(min(fits))
-        # listMax.append(max(fits))
-        # listMean.append(mean)
-        # listStd.append(std)
-        # best_ind = tools.selBest(pop, 1)[0]
-        # listBest.append(best_ind.fitness.values)
-
         print("Generation " + str(g))
         print(" Min %s" % min(fits))
         print(" Max %s" % max(fits))
@@ -202,8 +189,6 @@ def genetics(selection, k, crossing, indpb, pop_size, prob_mut, prob_cross,
         print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
 
     print("-- End of (successful) evolution --")
-
-    return listMin, listMax, listMean, listStd, listBest
 
 
 def set_selection(toolbox, selection, k):
@@ -238,29 +223,6 @@ def set_crossing(toolbox, crossing, indpb):
     return toolbox
 
 
-def savePlots(graphList, graphType):
-    if graphType == 1:
-        plt.plot(graphList, label="sredni osobnik")
-        name = "srednia-osobnik"
-    elif graphType == 2:
-        plt.plot(graphList, label="Srednie odchylenie")
-        name = "srednie-odchylenie-osobnik"
-    elif graphType == 3:
-        plt.plot(graphList, label="Max funkcji celu")
-        name = "max-funkcji-celu"
-    elif graphType == 4:
-        plt.plot(graphList, label="Min funkcji celu")
-        name = "min-funkcji-celu"
-    else:
-        plt.plot(graphList, label="najlepszy osobnik w danej populacji")
-        name = "najlepszy-populacja-osobnik"
-
-    leg = plt.legend(loc='best', ncol=2, mode="expand", shadow=True, fancybox=True)
-    leg.get_frame().set_alpha(0.5)
-    plt.savefig('saved/' + name + '.png', bbox_inches='tight')
-    plt.close()
-
-
 if __name__ == '__main__':
     df = pd.read_csv('ReplicatedAcousticFeatures-ParkinsonDatabase.csv')
     y = df['Status']
@@ -270,9 +232,10 @@ if __name__ == '__main__':
     number_of_atributtes = len(df.columns)
 
     selection, tournament_size, crossing, indpb, pop_size, prob_mut, prob_cross, num_of_iter, classifier = user_input()
-    listMin, listMax, listMean, listStd, listBest = genetics(selection, tournament_size, crossing,
-                                                             indpb, pop_size, prob_mut, prob_cross,
-                                                             num_of_iter, classifier, number_of_atributtes, df, y)
+    genetics(selection, tournament_size, crossing,
+             indpb, pop_size, prob_mut, prob_cross,
+             num_of_iter, classifier, number_of_atributtes, df, y)
+
     '''
     
     Do testow zeby nie wpisywac
@@ -286,9 +249,3 @@ if __name__ == '__main__':
     classifier = 1
 
     '''
-
-    # savePlots(listMean, 1)
-    # savePlots(listStd, 2)
-    # savePlots(listMax, 3)
-    # savePlots(listMin, 4)
-    # savePlots(listBest, 5)
