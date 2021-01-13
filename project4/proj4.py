@@ -1,6 +1,5 @@
 import random
 
-import matplotlib.pyplot as plt
 import pandas as pd
 from deap import base
 from deap import creator
